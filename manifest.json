@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "Laya Sponsor Skip",
+  "version": "0.1.0",
+  "description": "Fun project: finds sponsor reads in YouTube videos with a local Laya decision model and skips them. No cloud, no key.",
+  "permissions": ["storage"],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*",
+    "https://sponsor.ajay.app/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://www.youtube.com/*"],
+      "js": ["src/loader.js"],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/*.js"],
+      "matches": ["*://www.youtube.com/*"]
+    }
+  ],
+  "action": {
+    "default_popup": "src/popup.html",
+    "default_title": "Laya Sponsor Skip",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

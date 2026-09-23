@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Laya Sponsor Skip</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <h1>⏭️ Laya Sponsor Skip</h1>
+    <label class="switch" title="On / off">
+      <input type="checkbox" id="enabled" />
+      <span></span>
+    </label>
+  </header>
+
+  <section class="stats">
+    <div><strong id="statPage">0</strong><span>skipped here</span></div>
+    <div><strong id="statTotal">0</strong><span>skipped total</span></div>
+  </section>
+
+  <section>
+    <label for="serverUrl">Local judge server</label>
+    <div class="row">
+      <input type="text" id="serverUrl" placeholder="http://127.0.0.1:8765/judge" autocomplete="off" spellcheck="false" />
+      <button id="testServer" title="Test the local server">Test</button>
+    </div>
+    <p class="hint" id="serverStatus"></p>
+  </section>
+
+  <section>
+    <label for="threshold">Sponsor read: P ≥ <span id="thresholdValue">0.70</span></label>
+    <input type="range" id="threshold" min="0.3" max="0.95" step="0.05" />
+  </section>
+
+  <section>
+    <label for="cutThreshold">Boundary cut: P ≥ <span id="cutValue">0.80</span></label>
+    <input type="range" id="cutThreshold" min="0.5" max="0.99" step="0.01" />
+  </section>
+
+  <section class="row">
+    <label class="check" title="Jump over a read as soon as it is confirmed, without asking">
+      <input type="checkbox" id="autoSkip" /> auto-skip
+    </label>
+    <label class="check" title="Try to turn the video's captions on; the transcript is read from them">
+      <input type="checkbox" id="enableCaptions" /> captions on
+    </label>
+    <label class="check" title="Small toast after a skip"><input type="checkbox" id="toast" /> toast</label>
+  </section>
+
+  <section class="grid">
+    <label>min read (s)<input type="number" id="minReadSeconds" min="5" max="120" step="1" /></label>
+    <label>max skip (s)<input type="number" id="maxReadSeconds" min="30" max="600" step="10" /></label>
+    <label>read limit<input type="number" id="maxReads" min="1" max="20" step="1" /></label>
+    <label>jump (s)<input type="number" id="stepSeconds" min="5" max="60" step="1" /></label>
+  </section>
+
+  <section class="row">
+    <button id="reanalyze">Re-analyze this video</button>
+    <span class="hint" id="pageStatus"></span>
+  </section>
+
+  <p class="hint">
+    Fun project, not a real ad blocker. Local only: the transcript lines and the
+    video title go to 127.0.0.1 and nowhere else. The read while watching uses the
+    video's own captions, so the first seconds of a read are always heard.
+  </p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+{
+  "video": {
+    "videoId": "fixture00001",
+    "title": "I built a local model that skips YouTube sponsor reads",
+    "channel": "Local First Lab",
+    "durationMs": 350000
+  },
+  "lineMs": 7000,
+  "comment": "Hand-written transcript of a plausible tech video. Two sponsor reads are labelled below; the lines around them are deliberately awkward: a subscribe/merch/Patreon block right after the first read (not sponsors), and a line about 'promo codes, free trials, links in the description' near the end that the code heuristic is allowed to get wrong but must not turn into a read.",
+  "expected": {
+    "reads": [
+      { "label": "espresso machine read", "startMs": 56000, "endMs": 105000 },
+      { "label": "analytics dashboard read", "startMs": 203000, "endMs": 252000 }
+    ],
+    "startToleranceMs": 10000,
+    "endToleranceMs": 10000,
+    "maxBleedMs": 8000
+  },
+  "lines": [
+    { "startMs": 0, "endMs": 7000, "text": "Today we are building something small and slightly silly: a local model that watches what you watch." },
+    { "startMs": 7000, "endMs": 14000, "text": "It runs on the laptop, it never calls a cloud service, and it exists because I got tired of skipping ads by hand." },
+    { "startMs": 14000, "endMs": 21000, "text": "The idea came from a project that does this with a hosted typed decision model, and the whole design is worth copying." },
+    { "startMs": 21000, "endMs": 28000, "text": "Code owns the timestamps, and the model only answers yes or no questions about a line of text that already exists." },
+    { "startMs": 28000, "endMs": 35000, "text": "That split is the reason this whole thing runs locally in about fourteen milliseconds per question." },
+    { "startMs": 35000, "endMs": 42000, "text": "So in this video I want to walk through the four pieces: captions, lines, questions and the skip itself." },
+    { "startMs": 42000, "endMs": 49000, "text": "By the end you will have a clear picture of where the model is useful and where plain code has to do the work." },
+    { "startMs": 49000, "endMs": 56000, "text": "Let me start with the way the transcript arrives, because that part surprised me the most." },
+
+    { "startMs": 56000, "endMs": 63000, "text": "Before we get to the build, a quick word about the people who made this video possible." },
+    { "startMs": 63000, "endMs": 70000, "text": "Today's video is sponsored by Brewmaster, the espresso machine that has replaced the office kettle for us." },
+    { "startMs": 70000, "endMs": 77000, "text": "It heats up in about four seconds and it grinds the beans right before the shot." },
+    { "startMs": 77000, "endMs": 84000, "text": "We have been using it for three months, and the crema is honestly the best part of it." },
+    { "startMs": 84000, "endMs": 91000, "text": "If you want one, head to brewmaster dot com slash laya and use my code LAYA20 at the checkout." },
+    { "startMs": 91000, "endMs": 98000, "text": "That is twenty percent off your first machine, and it also applies to the beans." },
+    { "startMs": 98000, "endMs": 105000, "text": "The link is in the description below, and thank you to Brewmaster for sponsoring today's video." },
+
+    { "startMs": 105000, "endMs": 112000, "text": "Anyway, back to the build. The whole idea of the project is that code owns every timestamp." },
+    { "startMs": 112000, "endMs": 119000, "text": "If you enjoy this kind of project, subscribe and hit the bell, it really does help the channel." },
+    { "startMs": 119000, "endMs": 126000, "text": "There is also a merch store now, and channel memberships, if you want the extra development logs." },
+    { "startMs": 126000, "endMs": 133000, "text": "Patreon supporters get the source code early, which is a nice way of saying thank you." },
+    { "startMs": 133000, "endMs": 140000, "text": "The first piece is the transcript. YouTube already renders captions, so we simply read them as they appear." },
+    { "startMs": 140000, "endMs": 147000, "text": "Each caption becomes a cue with a start time, and the cues are merged into numbered transcript lines." },
+    { "startMs": 147000, "endMs": 154000, "text": "A line ends when the speaker pauses, when it reaches about eleven words, or at a full stop." },
+    { "startMs": 154000, "endMs": 161000, "text": "Then the local model gets one question per line: is this line inside a paid read?" },
+    { "startMs": 161000, "endMs": 168000, "text": "It answers with a probability, and the code decides what to do with that number." },
+    { "startMs": 168000, "endMs": 175000, "text": "Above seventy percent the line counts as inside a read, and above eighty we are willing to cut there." },
+    { "startMs": 175000, "endMs": 182000, "text": "The boundary is the part that matters most, because cutting a line early eats the video's own content." },
+    { "startMs": 182000, "endMs": 189000, "text": "So we ask about the edges separately, and then we walk backwards until the lead-in starts." },
+    { "startMs": 189000, "endMs": 196000, "text": "The lead-in is the story that exists only to arrive at the sponsor, and it is part of the read." },
+    { "startMs": 196000, "endMs": 203000, "text": "Here the whole transcript is about fifty lines, so the local model answers everything in under a second." },
+
+    { "startMs": 203000, "endMs": 210000, "text": "Let me take a quick break here and talk about the other sponsor of this video, Levelup Analytics." },
+    { "startMs": 210000, "endMs": 217000, "text": "It is the dashboard we use to watch how the extension behaves on real pages during the day." },
+    { "startMs": 217000, "endMs": 224000, "text": "You get the first month free if you sign up today with the link in the show notes." },
+    { "startMs": 224000, "endMs": 231000, "text": "It handles about a million events a day on their smallest plan, which is plenty for us." },
+    { "startMs": 231000, "endMs": 238000, "text": "Their support answered a question of ours in about ten minutes, which is why we stayed with them." },
+    { "startMs": 238000, "endMs": 245000, "text": "Go to levelup analytics dot io slash laya and use the code LAYA for a free upgrade." },
+    { "startMs": 245000, "endMs": 252000, "text": "Thank you to Levelup for sponsoring the middle of the video, and now back to the code." },
+    { "startMs": 252000, "endMs": 259000, "text": "Now, the part I got wrong the first time: the transcript keeps growing while you watch the video." },
+
+    { "startMs": 259000, "endMs": 266000, "text": "So the pipeline has to judge the tail again, because the last line is still being spoken." },
+    { "startMs": 266000, "endMs": 273000, "text": "We keep a map from line index to probability and only ask about the lines that are new." },
+    { "startMs": 273000, "endMs": 280000, "text": "The open read is the interesting case, because we do not know where it ends yet." },
+    { "startMs": 280000, "endMs": 287000, "text": "While the newest line still says yes, the video steps forward by ten seconds at a time." },
+    { "startMs": 287000, "endMs": 294000, "text": "As soon as two lines in a row say no, the read is closed and the end is known." },
+    { "startMs": 294000, "endMs": 301000, "text": "That is the same trade the audio mode upstream makes: the first seconds of a read are heard." },
+    { "startMs": 301000, "endMs": 308000, "text": "Everything after that is a jump that the code decided, never a guess from the model." },
+    { "startMs": 308000, "endMs": 315000, "text": "The panel shows every question and every probability, so you can see why it cut where it did." },
+    { "startMs": 315000, "endMs": 322000, "text": "If the model is missing, a small heuristic stands in, and the panel says so in the badge." },
+    { "startMs": 322000, "endMs": 329000, "text": "That heuristic is not clever, it just knows the phrases that only exist to sell something." },
+    { "startMs": 329000, "endMs": 336000, "text": "Promo codes, free trials, links in the description, and the sentences that introduce them." },
+    { "startMs": 336000, "endMs": 343000, "text": "It is worse than the model, and it is honest about it, which felt like the right trade." },
+    { "startMs": 343000, "endMs": 350000, "text": "That is the whole project. If it saved you a minute of a coffee ad, it did its job." }
+  ]
+}

@@ -1,0 +1,204 @@
+<!doctype html>
+<!--
+  Live-path harness: runs the real content script (src/content.js) against a fake
+  player, with a stubbed `chrome` API, and reports what it did.
+
+  This is the closest thing to loading the extension without Chrome: the modules,
+  the caption capture loop, the judging loop, the panel, and the seek are all the
+  shipping ones — only YouTube, the clock and the extension APIs are fake.
+
+    npm run serve    →   http://localhost:8788/test/live-harness.html
+
+  The replay is compressed (500 ms per transcript line, so a 5:50 video in ~25 s),
+  which is harsher than watching at 1x: every pipeline latency is worth ~14 s of
+  video time here. Seeks are honoured, so the caption feed jumps with the player.
+
+  The page writes a journal to #journal; open the devtools console for the details.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Laya Sponsor Skip — live path harness</title>
+  <style>
+    :root { color-scheme: light dark; font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; }
+    body { margin: 0; padding: 18px; background: Canvas; color: CanvasText; }
+    h1 { font: 600 15px/1.4 system-ui, sans-serif; margin: 0 0 10px; }
+    #mount { height: 90px; background: #0b1020; color: #e2e8f0; display: flex; align-items: center; padding: 0 14px; border-radius: 8px; }
+    #journal { white-space: pre-wrap; margin-top: 12px; }
+    .ok { color: #16a34a; }
+    .bad { color: #e11d48; }
+  </style>
+</head>
+<body>
+  <h1>live path: captions → lines → local judge → jump</h1>
+  <div id="mount"><span id="caption">(no caption)</span></div>
+  <video id="fake-video" style="width:120px;height:68px;background:#111;margin-top:10px"></video>
+  <div class="ytp-caption-window-container" style="display:none"></div>
+  <div id="journal"></div>
+  <script type="module">
+    const journal = [];
+    const say = (line) => {
+      journal.push(line);
+      document.getElementById("journal").textContent = journal.join("\n");
+    };
+
+    // ---- fake player: a <video> whose clock we drive, and the caption element
+    // YouTube would be rendering at that moment.
+    const video = document.getElementById("fake-video");
+    const captionEl = document.createElement("span");
+    captionEl.className = "ytp-caption-segment";
+    document.querySelector(".ytp-caption-window-container").appendChild(captionEl);
+
+    let clockMs = 0;
+    let pendingSeekMs = null;
+    const seeks = [];
+    Object.defineProperty(video, "currentTime", {
+      get: () => clockMs / 1000,
+      set: (value) => {
+        seeks.push(Math.round(value * 1000));
+        clockMs = Math.round(value * 1000);
+        // A real player would carry on from the new position, so the caption feeder
+        // has to skip forward too — otherwise the read is "played twice".
+        pendingSeekMs = clockMs;
+      },
+      configurable: true,
+    });
+    Object.defineProperty(video, "duration", { get: () => 350, configurable: true });
+    Object.defineProperty(video, "paused", { get: () => false, configurable: true });
+    Object.defineProperty(video, "ended", { get: () => false, configurable: true });
+    video.classList.add("html5-main-video");
+
+    // A CC button that starts off, so enableCaptions() has something to click.
+    const cc = document.createElement("button");
+    cc.className = "ytp-subtitles-button";
+    cc.setAttribute("aria-pressed", "false");
+    cc.addEventListener("click", () => { cc.setAttribute("aria-pressed", "true"); video.clicks = (video.clicks ?? 0) + 1; });
+    document.body.appendChild(cc);
+
+    // ---- fake extension APIs: storage, and the judge round-trip to the real server
+    const store = {
+      sync: { enabled: true, autoSkip: true, threshold: 0.7, cutThreshold: 0.8, minReadSeconds: 20, maxReadSeconds: 180, maxReads: 6, stepSeconds: 10, enableCaptions: true, toast: false, serverUrl: "http://127.0.0.1:8765/judge" },
+      local: { totalSkipped: 0 },
+    };
+    const listeners = { runtime: [] };
+    let judgeCalls = 0;
+    let questions = 0;
+
+    window.chrome = {
+      storage: {
+        sync: { get: async (defaults) => ({ ...defaults, ...store.sync }), set: async (patch) => Object.assign(store.sync, patch) },
+        local: {
+          get: async (key) => (typeof key === "string" ? { [key]: store.local[key] } : { ...key, ...store.local }),
+          set: async (patch) => Object.assign(store.local, patch),
+          remove: async (key) => { delete store.local[key]; },
+        },
+        onChanged: { addListener: () => {} },
+      },
+      runtime: {
+        onMessage: { addListener: (fn) => listeners.runtime.push(fn) },
+        async sendMessage(msg) {
+          if (msg?.type === "judge") {
+            judgeCalls++;
+            questions += msg.candidates.length;
+            const { judgeBatch } = await import("../src/laya.js");
+            try {
+              return await judgeBatch({ state: msg.state, candidates: msg.candidates, questions: msg.questions, endpoint: store.sync.serverUrl });
+            } catch (err) {
+              return { error: String(err.message ?? err) };
+            }
+          }
+          if (msg?.type === "skipped") {
+            store.local.totalSkipped = (store.local.totalSkipped ?? 0) + msg.count;
+            return { ok: true, totalSkipped: store.local.totalSkipped };
+          }
+          if (msg?.type === "sponsorblock") return { segments: [] };
+          return { ok: true };
+        },
+      },
+    };
+
+    // ---- the fake watch page: a path the content script accepts as one.
+    // The fixture is fetched first, and by absolute path, because pushing the fake
+    // URL moves the document's base for relative requests.
+    const fixture = await (await fetch("/test/fixtures/demo-transcript.json")).json();
+    history.pushState({}, "", "/shorts/fixture00001");
+
+    say(`fixture: ${fixture.lines.length} lines, ${fixture.expected.reads.length} labelled read(s)`);
+    say(`watch page: ${location.pathname}${location.search} → isWatchPage ${new URL(location.href).pathname}`);
+
+    // ---- load the real content script
+    await import("../src/content.js");
+    const contentLoaded = !!document.getElementById("lss-panel");
+    say(`content script loaded: ${contentLoaded ? "yes" : "NO"} (panel present)`);
+
+    // ---- drive the video: one caption every 200 ms (the capture loop's own rate)
+    let index = 0;
+    const played = [];
+    const play = setInterval(() => {
+      if (pendingSeekMs != null) {
+        const target = pendingSeekMs;
+        pendingSeekMs = null;
+        const next = fixture.lines.findIndex((l) => l.startMs >= target); // jump, and skip the read's lines
+        index = next < 0 ? fixture.lines.length : next;
+      }
+      const line = fixture.lines[index++];
+      if (!line) {
+        clearInterval(play);
+        captionEl.textContent = "";
+        say(`\nplayed ${played.length} of ${fixture.lines.length} lines, clock ${(clockMs / 1000).toFixed(1)}s, seeks so far: ${seeks.length}`);
+        return;
+      }
+      clockMs = line.startMs;
+      captionEl.textContent = line.text;
+      played.push(line.index);
+    }, 500);
+
+    // ---- report after the loops have had time to run
+    setTimeout(() => {
+      const panel = document.getElementById("lss-panel");
+      const reads = [...panel.querySelectorAll(".lss-read")].map((row) => row.innerText.replace(/\n/g, " | "));
+      const badge = panel.querySelector(".lss-badge")?.textContent;
+      const status = panel.querySelector(".lss-muted")?.textContent;
+      say(`\npanel: ${panel ? "present" : "MISSING"} · ${badge} · ${status}`);
+      for (const read of reads) say(`  read: ${read}`);
+
+      // A seek is legitimate while it lands inside a read (that is the by-ear step)
+      // or within one step past a read's end. The margin is generous on purpose:
+      // while a read is open the live loop steps by 10 s by ear, and with the code
+      // heuristic answering, a read's own end can be one line late as well.
+      const nearRead = (ms) => fixture.expected.reads.some((r) => ms > r.startMs - 500 && ms <= r.endMs + 15000);
+      const badSeeks = seeks.filter((ms) => !nearRead(ms));
+      const backwards = seeks.filter((ms, i) => i > 0 && ms < seeks[i - 1]);
+      const forwardOnly = seeks.every((ms, i) => i === 0 || ms > seeks[i - 1]);
+      const mini = cc.getAttribute("aria-pressed") === "true";
+
+      say(`\ncaptions enabled by the extension: ${mini ? "yes" : "no"}`);
+      say(`judge calls: ${judgeCalls}, questions: ${questions}`);
+      say(`seeks: ${seeks.map((ms) => (ms / 1000).toFixed(1) + "s").join(", ") || "none"}`);
+      const readLines = new Set();
+      for (const r of fixture.expected.reads) for (const line of fixture.lines) if (line.startMs >= r.startMs && line.startMs < r.endMs) readLines.add(line.index);
+      const skippedLines = [...readLines].filter((line) => !played.includes(line)).length;
+      say(`${skippedLines} of ${readLines.size} sponsor lines were never played (the compressed replay leaves the loop less room than a 1x viewing does)`);
+
+      // The live path at 7x speed cannot be as precise as playing at 1x: what must hold
+      // is that it found reads, kept them apart, and never moved the video backwards or
+      // into content. Precise skipping is what test/harness.html checks with its
+      // Skip button, where the read is already known end to end.
+      const results = [
+        ["panel rendered", !!panel],
+        ["reads found", reads.length >= 1],
+        ["reads are not duplicated", reads.length <= fixture.expected.reads.length],
+        ["never jumped into content", badSeeks.length === 0],
+        ["never jumped backwards", forwardOnly && backwards.length === 0],
+        ["captions enabled by the extension", mini],
+      ];
+      const jumpedIntoRead = badSeeks.length > 0;
+      say("");
+      for (const [label, ok] of results) say(`${ok ? "✅" : "❌"} ${label}`);
+      const failed = results.filter(([, ok]) => !ok).length;
+      say(failed ? `\n${failed} check(s) failed` : "\nall live-path checks passed");
+      window.__liveHarness = { reads, seeks, judgeCalls, questions, failed, jumpedIntoRead, skippedLines, played: played.length };
+    }, 45000);
+  </script>
+</body>
+</html>

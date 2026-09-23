@@ -1,0 +1,241 @@
+<!doctype html>
+<!--
+  Harness: a fake video whose transcript is the labelled fixture.
+  It runs the real pipeline (src/sponsor.js) and the real panel (src/panel.js)
+  against the local judge server — or against the code heuristic when the server
+  is not running — and lets you watch a skip land.
+
+    terminal 1: python3 ../laya-adblock/server/server.py      (or LAYA_HEURISTIC=1 ...)
+    terminal 2: npm run serve                                  → http://localhost:8788/test/harness.html
+
+  Nothing here is extension code: the harness only supplies the video clock, the
+  transcript and a place to hang the panel. The red bands are what the pipeline
+  found; Skip moves the clock, which is what the content script does with
+  <video>.currentTime on the real page.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Laya Sponsor Skip — harness</title>
+  <style>
+    :root { color-scheme: light dark; font: 14px/1.5 system-ui, sans-serif; }
+    body { margin: 0; padding: 22px 24px 80px; background: Canvas; color: CanvasText; max-width: 900px; }
+    h1 { font-size: 17px; margin: 0 0 4px; }
+    p.lead { margin: 0 0 18px; opacity: .75; font-size: 12.5px; max-width: 70ch; }
+    .fake { border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 10px; overflow: hidden; }
+    .screen { height: 168px; background: #0b1020; color: #e2e8f0; display: flex; align-items: center; justify-content: center; font-size: 15px; padding: 0 22px; text-align: center; }
+    .bar { position: relative; height: 34px; background: color-mix(in srgb, CanvasText 8%, transparent); }
+    .band { position: absolute; top: 7px; height: 20px; background: #e11d48; opacity: .75; border-radius: 3px; }
+    .band.expected { background: #0ea5e9; opacity: .45; top: 24px; height: 6px; }
+    .cursor { position: absolute; top: 0; width: 2px; height: 34px; background: #f8fafc; box-shadow: 0 0 4px #000; }
+    .controls { display: flex; gap: 8px; align-items: center; padding: 10px 12px; border-top: 1px solid color-mix(in srgb, CanvasText 15%, transparent); }
+    button { font: inherit; padding: 5px 10px; border-radius: 7px; border: 1px solid color-mix(in srgb, CanvasText 25%, transparent); background: ButtonFace; color: ButtonText; cursor: pointer; }
+    .clock { font-variant-numeric: tabular-nums; opacity: .8; font-size: 12.5px; margin-left: auto; }
+    .transcript { margin-top: 18px; border: 1px solid color-mix(in srgb, CanvasText 20%, transparent); border-radius: 10px; max-height: 260px; overflow: auto; padding: 8px 12px; font-size: 12.5px; }
+    .transcript div { display: flex; gap: 10px; padding: 1px 0; }
+    .transcript .t { opacity: .55; min-width: 44px; font-variant-numeric: tabular-nums; }
+    .transcript div.read { color: #e11d48; }
+    #status { margin-top: 14px; font-size: 12.5px; opacity: .8; white-space: pre-line; }
+  </style>
+</head>
+<body>
+  <h1>⏭️ Laya Sponsor Skip — harness</h1>
+  <p class="lead">
+    A fake 5:50 video whose transcript is <code>test/fixtures/demo-transcript.json</code>, with two
+    hand-labelled sponsor reads. Analyze runs the real pipeline against the local judge on
+    127.0.0.1:8765; if the server is down, a code heuristic answers and the panel says so in its badge.
+  </p>
+
+  <div class="fake">
+    <div class="screen" id="screen">▶ press play</div>
+    <div class="bar" id="bar"><div class="cursor" id="cursor" style="left:0"></div></div>
+    <div class="controls">
+      <button id="play">Play</button>
+      <button id="reset">Reset</button>
+      <span class="clock" id="clock">0:00 / 5:50</span>
+    </div>
+  </div>
+
+  <div class="transcript" id="transcript"></div>
+  <div id="status"></div>
+
+  <script type="module">
+    import { createPanel } from "../src/panel.js";
+    import { indexLines, msToLabel } from "../src/transcript.js";
+    import { detectSponsors, heuristicProbabilities, makeJudge } from "../src/sponsor.js";
+    import { DEFAULTS as PIPELINE_DEFAULTS } from "../src/sponsor.js";
+    import { judgeBatch } from "../src/laya.js";
+    import { parsePastedTranscript } from "../src/transcript.js";
+
+    const endpoint = new URLSearchParams(location.search).get("judge") ?? "http://127.0.0.1:8765/judge";
+    const fixtureJson = await (await fetch("./fixtures/demo-transcript.json")).json();
+    const fixture = { ...fixtureJson, lines: indexLines(fixtureJson.lines) };
+
+    const state = {
+      lines: fixture.lines,
+      reads: [],
+      log: [],
+      model: null,
+      heuristic: false,
+      positionMs: 0,
+      playing: false,
+      settings: { ...PIPELINE_DEFAULTS, autoSkip: false, stepMs: 10000 },
+      skipped: 0,
+      lastError: null,
+    };
+
+    const el = (id) => document.getElementById(id);
+
+    function renderTranscript() {
+      const box = el("transcript");
+      box.replaceChildren();
+      for (const line of state.lines) {
+        const row = document.createElement("div");
+        const inRead = state.reads.some((read) => line.startMs >= read.startMs && line.startMs < read.endMs);
+        if (inRead) row.className = "read";
+        const t = document.createElement("span");
+        t.className = "t";
+        t.textContent = msToLabel(line.startMs);
+        const text = document.createElement("span");
+        text.textContent = `L${String(line.index).padStart(3, "0")} ${line.text}`;
+        row.append(t, text);
+        box.appendChild(row);
+      }
+    }
+
+    function renderTimeline() {
+      const bar = el("bar");
+      for (const old of bar.querySelectorAll(".band")) old.remove();
+      const total = fixture.video.durationMs;
+      for (const read of fixture.expected.reads) {
+        const band = document.createElement("div");
+        band.className = "band expected";
+        band.style.left = `${(read.startMs / total) * 100}%`;
+        band.style.width = `${((read.endMs - read.startMs) / total) * 100}%`;
+        bar.appendChild(band);
+      }
+      for (const read of state.reads) {
+        const band = document.createElement("div");
+        band.className = "band";
+        band.title = `found ${msToLabel(read.startMs)} – ${msToLabel(read.endMs)}`;
+        band.style.left = `${(read.startMs / total) * 100}%`;
+        band.style.width = `${((read.endMs - read.startMs) / total) * 100}%`;
+        bar.appendChild(band);
+      }
+      const cursor = el("cursor");
+      cursor.style.left = `${(state.positionMs / total) * 100}%`;
+      el("clock").textContent = `${msToLabel(state.positionMs)} / ${msToLabel(total)}`;
+      const current = state.lines.find((line, i) => state.positionMs >= line.startMs && state.positionMs < (state.lines[i + 1]?.startMs ?? total));
+      el("screen").textContent = current ? current.text : "▶ press play";
+    }
+
+    function renderPanel() {
+      panel.render({
+        model: state.model,
+        heuristic: state.heuristic,
+        source: "fixture transcript",
+        capturedLines: state.lines.length,
+        capturedMs: fixture.video.durationMs,
+        reads: state.reads,
+        log: state.log,
+        settings: state.settings,
+        stats: { skippedHere: state.skipped, skippedTotal: state.skipped },
+      });
+      panel.setError(state.lastError ? `Local judge: ${state.lastError}` : "");
+    }
+
+    const panel = createPanel({
+      onSkip: (read) => {
+        const target = read.endMs + 300;
+        state.positionMs = Math.min(target, fixture.video.durationMs);
+        read.skipped = true;
+        state.skipped++;
+        state.log.push({ kind: "skip", at: msToLabel(target), verdict: "skipped to the end of the read", at_: Date.now() });
+        renderTimeline();
+        renderPanel();
+      },
+      onAutoSkip: (on) => {
+        state.settings.autoSkip = on;
+        state.log.push({ kind: "auto-skip", verdict: on ? "on" : "off" });
+        renderPanel();
+      },
+      onAnalyze: () => analyze(),
+      onPaste: (text) => {
+        const parsed = parsePastedTranscript(text);
+        if (!parsed.lines.length) return;
+        state.lines = parsed.lines;
+        state.log.push({ kind: "paste", verdict: `${parsed.lines.length} line(s), ${parsed.timed ? "timed" : "timings estimated"}` });
+        renderTranscript();
+        analyze();
+      },
+      onReanalyze: () => {
+        state.reads = [];
+        state.log = [];
+        analyze();
+      },
+      onCompare: () => {
+        el("status").textContent = "SponsorBlock comparison needs the extension (the harness has no workers).";
+      },
+      onClear: () => {
+        state.reads = [];
+        state.log = [];
+        renderTimeline();
+        renderTranscript();
+        renderPanel();
+      },
+      onClose: () => panel.hide(),
+    });
+
+    async function analyze() {
+      const judge = makeJudge({
+        video: fixture.video,
+        transport: async ({ state: judgeState, candidates, questions }) => {
+          try {
+            return await judgeBatch({ state: judgeState, candidates, questions, endpoint });
+          } catch (err) {
+            state.lastError = err.message;
+            return { error: err.message, probabilities: heuristicProbabilities(candidates), model: "heuristic (offline)" };
+          }
+        },
+        log: (entry) => state.log.push({ ...entry, at_: Date.now() }),
+      });
+      const result = await detectSponsors({ video: fixture.video, lines: state.lines, judge, settings: state.settings, log: (entry) => state.log.push({ ...entry, at_: Date.now() }) });
+      state.reads = result.reads;
+      state.model = result.model;
+      state.heuristic = !!result.heuristic;
+      if (!state.lastError) panel.setError("");
+      el("status").textContent = `${result.reads.length} read(s) over ${state.lines.length} lines · model ${result.model ?? "?"} · ${result.log.length} decisions`;
+      renderTimeline();
+      renderTranscript();
+      renderPanel();
+    }
+
+    // The fake clock: 1 real second = 6 video seconds while "playing".
+    setInterval(() => {
+      if (!state.playing) return;
+      state.positionMs = Math.min(fixture.video.durationMs, state.positionMs + 6000);
+      renderTimeline();
+      if (state.positionMs >= fixture.video.durationMs) {
+        state.playing = false;
+        el("play").textContent = "Play";
+      }
+    }, 1000);
+
+    el("play").addEventListener("click", () => {
+      state.playing = !state.playing;
+      el("play").textContent = state.playing ? "Pause" : "Play";
+    });
+    el("reset").addEventListener("click", () => {
+      state.positionMs = 0;
+      state.playing = false;
+      el("play").textContent = "Play";
+      renderTimeline();
+    });
+
+    renderTimeline();
+    renderTranscript();
+    renderPanel();
+    await analyze();
+  </script>
+</body>
+</html>
