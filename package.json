@@ -5,6 +5,25 @@
   "license": "MIT",
   "type": "module",
   "description": "Fun Chrome extension: finds sponsor reads in YouTube videos with a local Laya decision model and skips them. No cloud, no key.",
+  "keywords": [
+    "youtube",
+    "chrome-extension",
+    "manifest-v3",
+    "sponsorblock",
+    "sponsor",
+    "skip",
+    "transcript",
+    "mlx",
+    "local-llm"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Samuel-Ku/laya-sponsor-skip.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Samuel-Ku/laya-sponsor-skip/issues"
+  },
+  "homepage": "https://github.com/Samuel-Ku/laya-sponsor-skip#readme",
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "live-check": "node test/live-check.mjs",
