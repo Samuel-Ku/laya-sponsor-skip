@@ -42,9 +42,11 @@ be discussed, not silently rejected.
 ## Before you open a PR
 
 ```bash
-npm test                       # unit tests, no server needed
-node test/live-check.mjs --fake   # full pipeline, heuristic answers
+npm run check                  # unit tests + full pipeline on the fixture (heuristic answers)
 ```
+
+(The one command runs `npm test` and `node test/live-check.mjs --fake`; CI runs
+the same thing.)
 
 With the judge running (heuristic mode is fine): `npm run live-check` must stay
 at 2/2 labelled reads with no false positives. For UI changes,

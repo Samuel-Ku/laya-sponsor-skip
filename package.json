@@ -27,6 +27,7 @@
   "scripts": {
     "test": "node --test test/*.test.mjs",
     "live-check": "node test/live-check.mjs",
+    "check": "npm test && node test/live-check.mjs --fake",
     "serve": "python3 -m http.server 8788",
     "judge": "python3 ../laya-adblock/server/server.py",
     "judge:heuristic": "LAYA_HEURISTIC=1 python3 ../laya-adblock/server/server.py",
