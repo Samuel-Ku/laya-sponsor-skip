@@ -63,7 +63,9 @@ jobs:
           fi
 
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release edit "$TAG" --title "$TITLE" --notes-file release-notes.md
+            # --draft=false: moving a tag that already has a release makes GitHub
+            # turn that release into a draft; retagging should self-heal.
+            gh release edit "$TAG" --title "$TITLE" --notes-file release-notes.md --draft=false
             echo "updated existing release ${TAG}"
           else
             gh release create "$TAG" --title "$TITLE" --notes-file release-notes.md
