@@ -35,6 +35,22 @@ small local model over `POST http://127.0.0.1:8765/judge`. No cloud, no key.
 - The shipping content script on a fake player passes all six live-path checks:
   no duplicate reads, no jump lands in content, no jump goes backwards.
 
+### Install
+
+1. Start the judge — the Laya server from the sibling ad-blocker project this
+   was built next to (check it out as a folder named `laya-adblock`), or point
+   the extension at any server answering the same `POST /judge` contract:
+   ```bash
+   cd laya-adblock
+   npm run server                                    # with the MLX checkpoint
+   # or: LAYA_HEURISTIC=1 python3 server/server.py   # no model, for trying it
+   ```
+2. `chrome://extensions` → Developer mode → **Load unpacked** → this repo's
+   folder (there is no packed `.crx` on purpose).
+3. Extension icon → **Test** → expect `OK – model: …`.
+4. Play a video with captions. The panel appears bottom-right; auto-skip is off
+   by default, so nothing jumps until you press **Skip**.
+
 ### Limits
 
 Captions only; the first seconds of a read are always heard in the live path;
