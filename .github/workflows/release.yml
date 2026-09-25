@@ -1,7 +1,7 @@
 # On a pushed v* tag: publish a GitHub Release whose notes are the tag's section
-# of CHANGELOG.md. Nothing is built or attached — there is no packed .crx on
-# purpose (Load unpacked wants the repo folder), so the auto-generated source
-# archive is the artifact. The test job gates the release on green checks, so a
+# of CHANGELOG.md, and pack a minimal extension.zip (manifest, src, icons,
+# LICENSE, README) as a release asset: unzip it and Load unpacked. There is no
+# packed .crx on purpose. The test job gates the release on green checks, so a
 # tag can only ever release a commit that passes the suite.
 name: release
 
@@ -69,3 +69,14 @@ jobs:
             gh release create "$TAG" --title "$TITLE" --notes-file release-notes.md
             echo "created release ${TAG}"
           fi
+
+          # The loadable artifact: exactly what Chrome unpacks, at the zip root.
+          # A tag whose manifest version does not match is a typo — refuse it.
+          MV=$(node -p "require('./manifest.json').version")
+          if [ "$MV" != "${TAG#v}" ]; then
+            echo "::error::manifest.json version ($MV) does not match the tag ($TAG) — bump the manifest before tagging."
+            exit 1
+          fi
+          zip -qr extension.zip manifest.json src icons LICENSE README.md
+          gh release upload "$TAG" extension.zip --clobber
+          echo "attached extension.zip to ${TAG}"

@@ -2,7 +2,7 @@
 
 [![test](https://github.com/Samuel-Ku/laya-sponsor-skip/actions/workflows/test.yml/badge.svg)](https://github.com/Samuel-Ku/laya-sponsor-skip/actions/workflows/test.yml)
 
-Releases are tagged `v*`; each tag's section in [CHANGELOG.md](CHANGELOG.md) becomes the GitHub Release notes automatically, after the same checks pass.
+Releases are tagged `v*`; each tag's section in [CHANGELOG.md](CHANGELOG.md) becomes the GitHub Release notes automatically, after the same checks pass — and every release carries a ready-to-unzip `extension.zip`.
 
 A Chrome extension (Manifest V3) that finds the sponsor reads inside a YouTube video
 and jumps over them. The semantic call — "is this spoken line part of a paid read?"

@@ -45,8 +45,10 @@ small local model over `POST http://127.0.0.1:8765/judge`. No cloud, no key.
    npm run server                                    # with the MLX checkpoint
    # or: LAYA_HEURISTIC=1 python3 server/server.py   # no model, for trying it
    ```
-2. `chrome://extensions` → Developer mode → **Load unpacked** → this repo's
-   folder (there is no packed `.crx` on purpose).
+2. Download **extension.zip** from this release and unzip it; then
+   `chrome://extensions` → Developer mode → **Load unpacked** → the unzipped
+   folder (or load the repo folder directly — there is no packed `.crx`, on
+   purpose).
 3. Extension icon → **Test** → expect `OK – model: …`.
 4. Play a video with captions. The panel appears bottom-right; auto-skip is off
    by default, so nothing jumps until you press **Skip**.
