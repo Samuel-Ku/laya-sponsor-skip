@@ -1,0 +1,46 @@
+name: Bug report
+description: A read was missed, something that is not a read got skipped, or the panel misbehaved.
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did the extension do, and what did you expect instead? (e.g. "it skipped the intro of my own video", "it never found the VPN read at 12:30")
+    validations:
+      required: true
+  - type: input
+    id: video
+    attributes:
+      label: Video link
+      description: A public YouTube link, with the timestamp of the read it got wrong (or "any video with captions" if it is not video-specific).
+    validations:
+      required: true
+  - type: textarea
+    id: judge
+    attributes:
+      label: Judge
+      description: Output of the judge's /health endpoint (curl http://127.0.0.1:8765/health) and what the panel badge says (model name or heuristic).
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Panel log
+      description: Expand the panel's log, select all, paste here. "Every question with its probability and latency" is exactly the evidence needed to say why it cut where it cut.
+    validations:
+      required: false
+  - type: textarea
+    id: console
+    attributes:
+      label: Console errors
+      description: Anything red in the page console (F12) or in chrome://extensions → the extension's service worker, if there is any.
+    validations:
+      required: false
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser and version, OS, and whether the video has manual captions, auto-generated ones, or none.
+    validations:
+      required: true

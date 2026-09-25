@@ -1,0 +1,26 @@
+name: Feature request
+description: An idea for what the extension should do — not how the pipeline should be rewired.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What should it do?
+      description: Describe the outcome you want while watching a video, not the implementation. (e.g. "I want it to catch the membership pitch at the end of videos", not "add a second model call before refinement")
+    validations:
+      required: true
+  - type: textarea
+    id: today
+    attributes:
+      label: What happens today?
+      description: What the extension currently does in that situation, including whether it is a miss, a false skip, or simply not supported (like captionless videos without a paste).
+    validations:
+      required: true
+  - type: checkboxes
+    id: split
+    attributes:
+      label: The one rule
+      description: Ideas are welcome from anywhere, but implementations keep the split that makes this testable — see CONTRIBUTING.md.
+      options:
+        - label: My idea can be built with code owning every timestamp and the model only answering typed questions about lines that already have one.
+          required: false
