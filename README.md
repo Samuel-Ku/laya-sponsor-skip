@@ -1,5 +1,7 @@
 # Laya Sponsor Skip ⏭️
 
+[![test](https://github.com/Samuel-Ku/laya-sponsor-skip/actions/workflows/test.yml/badge.svg)](https://github.com/Samuel-Ku/laya-sponsor-skip/actions/workflows/test.yml)
+
 A Chrome extension (Manifest V3) that finds the sponsor reads inside a YouTube video
 and jumps over them. The semantic call — "is this spoken line part of a paid read?"
 — is made by the same local typed-decision model the ad blocker uses, over

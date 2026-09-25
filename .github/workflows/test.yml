@@ -1,0 +1,27 @@
+# The repo has zero npm dependencies, so there is nothing to install: checkout,
+# a Node with `node --test`, and the two commands. live-check runs with --fake so
+# the code heuristic answers and no judge server is needed. To also try the real
+# server path, see test/live-check.mjs's header comment.
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: unit tests
+        run: npm test
+
+      - name: live check (fake judge, no server)
+        run: node test/live-check.mjs --fake
