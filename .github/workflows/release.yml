@@ -1,0 +1,71 @@
+# On a pushed v* tag: publish a GitHub Release whose notes are the tag's section
+# of CHANGELOG.md. Nothing is built or attached — there is no packed .crx on
+# purpose (Load unpacked wants the repo folder), so the auto-generated source
+# archive is the artifact. The test job gates the release on green checks, so a
+# tag can only ever release a commit that passes the suite.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - run: node test/live-check.mjs --fake
+
+  release:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish the release from CHANGELOG.md
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          ESC="${TAG//./\\.}"
+
+          HEADING=$(grep -m1 -E "^## \[?${ESC}\]?([[:space:]]|$)" CHANGELOG.md)
+          if [ -z "$HEADING" ]; then
+            echo "::error::CHANGELOG.md has no '## [${TAG}]' section — add one before tagging."
+            exit 1
+          fi
+
+          # NB: match the dash as an alternation of complete byte sequences,
+          # not a character class — a class over multibyte dashes strips
+          # individual bytes and corrupts the title.
+          TITLE=$(printf '%s' "$HEADING" | sed -E "s/^## \[?${ESC}\]?[[:space:]]*//; s/^(—|–|-|:) +//")
+          [ -n "$TITLE" ] || TITLE="$TAG"
+
+          # From this tag's heading to the next '## ' heading (### subsections stay in).
+          awk -v tag="$ESC" '
+            $0 ~ ("^## \\[?" tag "\\]?([[:space:]]|$)") { found = 1; next }
+            found && /^##([^#]|$)/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "::error::The '## [${TAG}]' section in CHANGELOG.md has no notes under it."
+            exit 1
+          fi
+
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TITLE" --notes-file release-notes.md
+            echo "updated existing release ${TAG}"
+          else
+            gh release create "$TAG" --title "$TITLE" --notes-file release-notes.md
+            echo "created release ${TAG}"
+          fi
