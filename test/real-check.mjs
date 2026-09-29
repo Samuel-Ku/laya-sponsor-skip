@@ -26,8 +26,8 @@ import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 
 import { indexLines, msToLabel } from "../src/transcript.js";
-import { deriveRuns } from "../src/detector.js";
-import { DEFAULTS, detectSponsors, heuristicProbabilities, judgeIndices, makeJudge, refineCandidate } from "../src/sponsor.js";
+import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
+import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
 import { checkServer, judgeBatch } from "../src/laya.js";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:8765/judge";
@@ -85,41 +85,30 @@ function pairByOverlap(left, right) {
 }
 
 /**
- * Drive the pipeline the way the watch page does: captions arrive in order, every
- * new line is judged as it appears, the shared detector decides which runs are
- * reads (the bridge included), and each new closed run is refined once. The tail
- * is left alone while it is still growing — the video is playing, so three quiet
- * judged lines after it are what mark it finished, exactly as in the loop.
+ * Drive the pipeline the way the watch page does: captions arrive in order, and
+ * the same detector the loop uses judges the new lines, decides which runs are
+ * reads and walks their edges. The open run is left alone — the video is playing,
+ * so its end is not known yet — and every rule the loop applies to a run it has
+ * already seen is applied here too.
  */
 async function driveLive({ lines, judge, settings = {}, log = () => {} }) {
   const opts = { ...DEFAULTS, ...settings };
+  const detector = createDetector({ judge, settings: opts, log });
   const WINDOW = 8; // lines per tick, about what the caption loop sees in 20 s
-  const flags = new Map();
   const attempted = new Set();
   const reads = [];
-  let judgedUpTo = 0;
 
   for (let upto = 0; upto < lines.length; upto += WINDOW) {
-    const fresh = [];
-    for (let i = judgedUpTo; i <= Math.min(upto, lines.length - 1); i++) fresh.push(i);
-    if (fresh.length) {
-      const probs = await judgeIndices(judge, lines, fresh, "inside", { log, settings: opts });
-      for (const [index, p] of probs) flags.set(index, p);
-      judgedUpTo = Math.min(upto, lines.length - 1) + 1;
-    }
-
-    const verdicts = lines.map((_, i) => (flags.has(i) ? flags.get(i) >= opts.threshold : null));
-    const found = deriveRuns(lines, verdicts);
-    const settledAt = Math.min(judgedUpTo - 1, lines.length - 1);
-    for (const run of found) {
+    const seen = lines.slice(0, Math.min(upto + 1, lines.length));
+    const { closed } = await detector.observe(seen);
+    for (const run of closed) {
       if (reads.length >= opts.maxReads) break; // the code-owned cap applies here too
-      if (run === found[found.length - 1] && settledAt - run.to < 3) continue;
       const key = `${run.from}-${run.to}`;
       if (attempted.has(key)) continue; // already refined at these exact edges
       attempted.add(key);
       const asMs = { startMs: lines[run.from].startMs, endMs: lines[run.to].endMs };
       if (reads.some((read) => overlaps(read, asMs))) continue;
-      const read = await refineCandidate({ lines, run, judge, settings: opts, log });
+      const read = await detector.refine(run);
       if (read) reads.push(read);
     }
   }

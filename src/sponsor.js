@@ -1,29 +1,17 @@
-// The sponsor-read pipeline.
+// The judge seam: what a sponsor read is, how one line is put to the judge, and
+// what the model is allowed to see at all.
 //
-// Code owns every timestamp and every threshold; the model only answers typed
-// noul questions about a line that already has one. That is the same split the
-// upstream project uses with Jev, and it is why this file can be tested offline:
-// swap the judge for the code heuristic and the whole thing still runs.
+// Code owns every timestamp and every threshold; the judge only answers typed noul
+// questions about a line that already has one. That is the same split the upstream
+// project uses with Jev, and it is why the whole pipeline runs offline: swap the
+// judge for the code heuristic below and nothing else changes.
 //
-// Shape of one pass: ask "is this line inside a sponsor read?" about every line,
-// hand the verdicts to the detector for the candidate runs, then walk the edges
-// and the lead-in with sharper questions, and finally read the seconds off the
-// lines.
+// The other half of the pipeline is ./detector.js, which turns those answers into
+// reads with boundaries. This file knows how to ask; that one knows where a read
+// is. Nothing here may import it — the detector is the caller.
 
-import { indexLines, lineLabel, medianLineMs, msToLabel } from "./transcript.js";
-import { deriveRuns, longEnough } from "./detector.js";
+import { lineLabel, msToLabel } from "./transcript.js";
 import { isHeuristic } from "./laya.js";
-
-export const DEFAULTS = {
-  threshold: 0.7, // a line counts as inside a read above this
-  cutThreshold: 0.8, // a boundary is only cut above this (upstream's phrase rule)
-  minReadMs: 20000, // shorter than this is not worth a skip
-  maxReadMs: 180000, // longer than this is not skipped at all
-  maxReads: 6,
-  stepMs: 10000, // live mode: jump size while a read is still being heard
-  batchSize: 6, // questions per local call — checkpoints are 512/1024 tokens
-  leadinLines: 15, // how far back the lead-in may reach
-};
 
 const TEXT_LIMIT = 220;
 const CONTEXT_LIMIT = 70;
@@ -49,6 +37,7 @@ const READING =
   "with the lines just before and after it for context. Lines are quoted as `line` (for example " +
   "`L042`); times are only for the reader.";
 
+/** The typed questions the detector asks, one per line it sends. */
 export function questionsFor(kind, count) {
   const ask = {
     inside: (k) =>
@@ -178,193 +167,4 @@ export function heuristicProbabilities(cards) {
     const hinted = Math.max(own, before * CONTEXT_WEIGHT, after * CONTEXT_WEIGHT_AFTER);
     return clamp(Number(hinted.toFixed(3)), 0.01, 0.98);
   });
-}
-
-// ---------- passes ----------
-
-/**
- * Ask one question kind about a list of line indices, batched so each local call
- * stays inside the checkpoint's context. Returns Map(index -> probability).
- */
-export async function judgeIndices(judge, lines, indices, kind, { log = () => {}, settings = {} } = {}) {
-  const { batchSize, threshold, cutThreshold } = { ...DEFAULTS, ...settings };
-  const floor = kind === "inside" ? threshold : cutThreshold;
-  const out = new Map();
-  for (let i = 0; i < indices.length; i += batchSize) {
-    const slice = indices.slice(i, i + batchSize);
-    const cards = slice.map((index) => lineCard(lines, index));
-    const t0 = Date.now();
-    const res = await judge({ cards, questions: questionsFor(kind, cards.length) });
-    res.probabilities.forEach((p, k) => {
-      out.set(slice[k], p);
-      log({
-        kind, line: lines[slice[k]].index, at: msToLabel(lines[slice[k]].startMs), text: cut(lines[slice[k]].text, 70),
-        p, verdict: p >= floor ? "yes" : "no", model: res.model, heuristic: res.heuristic, ms: Date.now() - t0,
-      });
-    });
-  }
-  return out;
-}
-
-/** One verdict per line, in order — the detector's input. */
-function flagsFromProbabilities(lines, probabilities, threshold) {
-  return lines.map((_, i) => {
-    const p = probabilities.get(i);
-    return p == null ? null : p >= threshold;
-  });
-}
-
-/**
- * Turn one candidate run into a read with code-owned boundaries.
- *
- * The edges are asked about explicitly ("is this the first line?", "is the read
- * over here?"), then the lead-in is walked back line by line, because the part
- * before the sponsor's name is still a read. Returns null when the read fails a
- * code-owned filter — too short to bother, or too long to skip without risking
- * the video's own content.
- */
-export async function refineCandidate({ lines, run, judge, settings = {}, log = () => {} }) {
-  const opts = { ...DEFAULTS, ...settings };
-  const startCandidates = [];
-  for (let i = Math.max(0, run.from - 2); i <= Math.min(lines.length - 1, run.from + 1); i++) startCandidates.push(i);
-  const endCandidates = [];
-  for (let i = Math.max(0, run.to - 1); i <= Math.min(lines.length - 1, run.to + 2); i++) endCandidates.push(i);
-
-  const startProbs = await judgeIndices(judge, lines, startCandidates, "start", { log, settings: opts });
-  const insideEdges = await judgeIndices(judge, lines, endCandidates, "inside", { log, settings: opts });
-
-  const confidentStarts = startCandidates.filter((i) => (startProbs.get(i) ?? 0) >= opts.cutThreshold);
-  let startIdx = confidentStarts.length ? Math.min(...confidentStarts) : run.from;
-
-  const insideAtEdge = endCandidates.filter((i) => (insideEdges.get(i) ?? 0) >= opts.threshold);
-  const endIdx = (insideAtEdge.length ? Math.max(...insideAtEdge) : run.to) + 1; // first line that is content again
-
-  // When in doubt, stop at the first line that reads as content again rather than
-  // cut further: landing a second inside the read costs a second of the read,
-  // landing past it costs the video's own content. So the "is the read over
-  // here?" answer is logged, not acted on — in live mode the open read is what
-  // continues the jump if the read turns out to run longer.
-  const endAsk = Math.min(endIdx, lines.length - 1);
-  const endProbs = await judgeIndices(judge, lines, [endAsk], "end", { log, settings: opts });
-  const endCertainty = endProbs.get(endAsk) ?? 0;
-  if (endCertainty < opts.cutThreshold) {
-    log({
-      kind: "end-unclear", line: lines[endAsk].index, at: msToLabel(lines[endAsk].startMs), p: endCertainty,
-      verdict: "end not confirmed — may stop a line early",
-    });
-  }
-
-  // Trace back to the lead-in: a read starts where the story that exists only to
-  // arrive at the sponsor starts.
-  let back = 0;
-  while (back < opts.leadinLines && startIdx > 0) {
-    const range = [];
-    for (let i = Math.max(0, startIdx - 2); i < startIdx; i++) range.push(i);
-    if (!range.length) break;
-    const leadProbs = await judgeIndices(judge, lines, range, "leadin", { log, settings: opts });
-    const confident = range.filter((i) => (leadProbs.get(i) ?? 0) >= opts.cutThreshold);
-    if (!confident.length) break;
-    startIdx = Math.min(...confident);
-    back += range.length;
-  }
-
-  const startMs = lines[startIdx].startMs;
-  const lastLine = lines[Math.min(endIdx, lines.length) - 1];
-  const endMs = endIdx < lines.length ? lines[endIdx].startMs : lastLine.endMs;
-  const durationMs = endMs - startMs;
-  const confidence = Math.min(
-    ...[...startProbs.values()].filter((p) => p >= opts.cutThreshold),
-    ...[...insideEdges.values()].filter((p) => p >= opts.threshold),
-    1,
-  );
-
-  if (durationMs < opts.minReadMs) {
-    log({ kind: "reject", line: lines[startIdx].index, at: msToLabel(startMs), verdict: "too short", ms: Math.round(durationMs) });
-    return null;
-  }
-  if (durationMs > opts.maxReadMs) {
-    log({ kind: "reject", line: lines[startIdx].index, at: msToLabel(startMs), verdict: "too long to skip safely", ms: Math.round(durationMs) });
-    return null;
-  }
-  return {
-    startMs,
-    endMs,
-    startLine: lines[startIdx].index,
-    endLine: lastLine.index,
-    durationMs,
-    confidence,
-    source: "transcript",
-  };
-}
-
-/**
- * Find the sponsor reads of a transcript.
- * Returns { reads, log, model, judged, heuristic }.
- *   reads: [{ startMs, endMs, startLine, endLine, confidence, source }]
- */
-export async function detectSponsors({ video, lines, judge, settings = {}, log = () => {}, onProgress = () => {} }) {
-  const opts = { ...DEFAULTS, ...settings };
-  const entries = [];
-  const say = (entry) => {
-    entries.push(entry);
-    log(entry);
-  };
-
-  if (!Array.isArray(lines) || lines.length < 2) {
-    return { reads: [], log: entries, model: null, judged: 0, heuristic: false };
-  }
-  lines = indexLines(lines); // saved transcripts may arrive without their indices
-
-  // Pass 1 — ask about every line, not a sample. A read can only be found where
-  // it was judged, and the detector may bridge a quiet middle only when that
-  // middle was heard (its `false`, not its `null`).
-  const indices = lines.map((_, i) => i);
-  onProgress({ phase: "scan", done: 0, total: indices.length });
-  const judged = await judgeIndices(judge, lines, indices, "inside", { log: say, settings: opts });
-  onProgress({ phase: "scan", done: indices.length, total: indices.length });
-
-  const flags = flagsFromProbabilities(lines, judged, opts.threshold);
-  const lineMs = medianLineMs(lines);
-  const minRun = Math.max(2, Math.min(4, Math.round(opts.minReadMs / lineMs)));
-  // The shape rule first, the length gate after it: a bridged middle makes a
-  // candidate out of pockets that are too short on their own, and refinement is
-  // what then applies the duration filters to whatever boundaries it lands on.
-  const runs = longEnough(deriveRuns(lines, flags), minRun);
-
-  // Pass 2 — walk the edges of the most likely runs.
-  const scored = runs
-    .map((run) => {
-      let best = 0;
-      for (let i = run.from; i <= run.to; i++) {
-        const p = judged.get(i);
-        if (p != null) best = Math.max(best, p);
-      }
-      return { run, score: best };
-    })
-    .sort((a, b) => b.score - a.score)
-    .slice(0, opts.maxReads)
-    .map((s) => s.run);
-
-  const reads = [];
-  for (const run of scored) {
-    const read = await refineCandidate({ lines, run, judge, settings: opts, log: say });
-    if (read) reads.push(read);
-  }
-
-  reads.sort((a, b) => a.startMs - b.startMs);
-  const merged = [];
-  for (const read of reads) {
-    const last = merged[merged.length - 1];
-    if (last && read.startMs <= last.endMs) {
-      last.endMs = Math.max(last.endMs, read.endMs);
-      last.endLine = Math.max(last.endLine, read.endLine);
-      last.durationMs = last.endMs - last.startMs;
-      last.confidence = Math.max(last.confidence, read.confidence);
-    } else {
-      merged.push({ ...read });
-    }
-  }
-
-  const model = [...entries].reverse().find((e) => e.model)?.model ?? null;
-  return { reads: merged, log: entries, model, judged: indices.length, heuristic: model ? isHeuristic(model) : false };
 }

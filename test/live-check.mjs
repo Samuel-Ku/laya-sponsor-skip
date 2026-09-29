@@ -13,7 +13,8 @@
 import { readFileSync } from "node:fs";
 
 import { indexLines, msToLabel } from "../src/transcript.js";
-import { detectSponsors, heuristicProbabilities, makeJudge } from "../src/sponsor.js";
+import { detectSponsors } from "../src/detector.js";
+import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
 import { checkServer, judgeBatch } from "../src/laya.js";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:8765/judge";

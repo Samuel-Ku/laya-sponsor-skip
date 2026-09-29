@@ -22,20 +22,33 @@ so without the bridge a lead-in pocket and an offer pocket stay two runs and nei
 is long enough to be worth a skip.
 **Heard quiet vs unjudged** — `false` is the judge saying "not a read" about a line;
 `null` is nobody having asked. A bridge may cross the first, never the second.
-**Open read** — the run at the tail of the transcript that has not settled: fewer
-than three quiet *judged* lines after it, so the speaker may still be inside it.
-Only the live path has one.
+**Open run** — the run at the tail of the transcript that has not settled: fewer than
+three quiet *judged* lines after it, so the speaker may still be inside it. A closed
+run's end is known; an open one's is not, and only the live path ever sees one.
+
+## The detector
+
+**Detector** — `createDetector({ judge, settings, log })` in `src/detector.js`: it
+holds the verdict for every line it has been shown, how far into the transcript it
+has judged, and the shape rules. Its interface is `observe(lines)` →
+`{ closed, open, newest, judged }`, `refine(run)` → a read or `null`, and `reset()`.
+**Judged** — a line the detector has a verdict for. A line without one is `null`, not
+`false`: nobody has asked about it, which is why it cannot be bridged across.
+**Newest verdict** — the verdict on the last line judged, which is what "am I hearing
+a read right now" is asked with when the loop decides whether to step forward.
 
 ## The two ways in
 
 **Live path** — captions are read as they are spoken (`src/content.js`), lines are
 judged as they appear, and reads are refined and stepped over while the video plays.
-This is the path that does the skipping.
+This is the path that does the skipping: it calls `observe()` on every tick and never
+sees a run before it exists.
 **Batch path** — the same detector over a whole transcript at once: the panel's
 **Analyze captured** and **Paste transcript** buttons, the eval, the tests
-(`detectSponsors()`).
-They cross the same seam — `deriveRuns()` in `src/detector.js` — and the eval fails
-if the live path loses a labelled read the batch path found.
+(`detectSponsors()`). It can rank the runs by how sure the judge was before refining
+them, which the live path cannot, because the live path meets a run before it knows
+what comes after it. The eval fails if the live path loses a labelled read the batch
+path found.
 
 ## The judge
 
