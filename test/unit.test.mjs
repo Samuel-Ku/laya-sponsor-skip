@@ -6,9 +6,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
-import { formatLines, groupRuns, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
-import { CRITERIA, DEFAULTS, detectSponsors, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor, refineCandidate } from "../src/sponsor.js";
-import { BRIDGE_MS, bridgeLinesFor, deriveRuns } from "../src/detector.js";
+import { formatLines, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
+import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
+import { CRITERIA, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor } from "../src/sponsor.js";
 import { MAX_CANDIDATES_PER_REQUEST, buildRequest, isHeuristic, parseResponse } from "../src/laya.js";
 
 const fixtureJson = JSON.parse(readFileSync(new URL("./fixtures/demo-transcript.json", import.meta.url), "utf8"));
@@ -59,45 +59,90 @@ test("time labels round-trip", () => {
   assert.equal(labelToMs("1:03:53"), 3833000);
 });
 
-test("groupRuns: finds runs of at least minRun", () => {
-  assert.deepEqual(groupRuns([false, true, true, false, true], { minRun: 2 }), [{ from: 1, to: 2 }]);
-  assert.deepEqual(groupRuns([true, true, false], { minRun: 2 }), [{ from: 0, to: 1 }]);
-  assert.deepEqual(groupRuns([true, false, true, true, true], { minRun: 2 }), [{ from: 2, to: 4 }]);
-});
-
 /** A transcript of `count` six-second lines, so the bridge budget is 10 lines. */
 const flatLines = (count) => Array.from({ length: count }, (_, i) => ({ index: i + 1, startMs: i * 6000, endMs: i * 6000 + 6000, text: `line ${i + 1}` }));
 
-/** flags from a list of indices that read as sponsor, `null` for unjudged lines. */
-const flagsFor = (count, yes = [], unknown = []) =>
-  Array.from({ length: count }, (_, i) => (yes.includes(i) ? true : unknown.includes(i) ? null : false));
+/** A judge that answers yes for the lines it was given, as `L003` or an index. */
+const judgeFrom = (yesFor) => {
+  const line = (card) => Number(String(card.line).slice(1)) - 1;
+  const mine = (card) => (typeof yesFor === "function" ? yesFor(line(card), card) : yesFor.has(card.line));
+  return async ({ cards }) => ({ probabilities: cards.map((card) => (mine(card) ? 0.95 : 0.05)), model: "stub", heuristic: false });
+};
 
-test("deriveRuns: a read bridges a middle that was judged and found quiet", () => {
-  const lines = flatLines(20);
-  assert.equal(bridgeLinesFor(lines), 10); // 60 s at 6 s a line
-  // Two pockets of yeses (the lead-in and the offer) with eight quiet lines between:
+const shapeOf = (observed) => [...observed.closed, ...(observed.open ? [observed.open] : [])].map((run) => [run.from, run.to]);
+
+test("the detector bridges a read's quiet middle, and only a bridgeable one", async () => {
+  const lines = flatLines(40);
+  // The lead-in and the offer, eight lines of pitch in between that names nothing:
   // the shape of the Surfshark read in the real fixtures, and the reason the live
   // loop used to find nothing at all.
-  assert.deepEqual(deriveRuns(lines, flagsFor(20, [2, 3, 12, 13])), [{ from: 2, to: 13 }]);
-});
-
-test("deriveRuns: a middle that was never judged is not bridgeable", () => {
-  const lines = flatLines(20);
-  // The same two pockets, but nobody has asked about line 7: a read may bridge what
-  // it has heard and found quiet, never what it has not heard.
-  assert.deepEqual(deriveRuns(lines, flagsFor(20, [2, 3, 12, 13], [7])), [
-    { from: 2, to: 3 },
-    { from: 12, to: 13 },
+  const bridged = await createDetector({ judge: judgeFrom(new Set(["L003", "L004", "L013", "L014"])) }).observe(lines);
+  assert.deepEqual(shapeOf(bridged), [[2, 13]]);
+  assert.equal(bridged.closed[0].score, 0.95);
+  // The same pocket eighteen lines later is past the budget: two candidates, not one.
+  const apart = await createDetector({ judge: judgeFrom(new Set(["L003", "L004", "L023", "L024"])) }).observe(lines);
+  assert.deepEqual(shapeOf(apart), [
+    [2, 3],
+    [22, 23],
   ]);
 });
 
-test("deriveRuns: a gap wider than the budget stays two runs", () => {
-  const lines = flatLines(40);
-  assert.deepEqual(deriveRuns(lines, flagsFor(40, [2, 3, 20, 21])), [
-    { from: 2, to: 3 },
-    { from: 20, to: 21 },
-  ]);
-  assert.equal(BRIDGE_MS, 60000);
+test("the detector waits for the lines it has not judged yet", async () => {
+  const lines = flatLines(60);
+  // One tick may judge a bounded number of lines, so the tail of a long video is
+  // unjudged until the next tick — and a read may only bridge a middle it has
+  // heard and found quiet, never one nobody has asked about.
+  const detector = createDetector({ judge: judgeFrom(new Set(["L035", "L036", "L044", "L045"])) });
+  const first = await detector.observe(lines);
+  assert.equal(first.judged, 40);
+  assert.deepEqual(shapeOf(first), [[34, 35]]); // the offer pocket has not been heard yet
+  const rest = await detector.observe(lines);
+  assert.equal(rest.judged, 60);
+  assert.deepEqual(shapeOf(rest), [[34, 44]]); // now it has, and the middle was quiet
+});
+
+test("the detector calls a growing tail open and closes it when the speaker moves on", async () => {
+  const lines = flatLines(30);
+  const judge = judgeFrom(new Set(["L011", "L012"]));
+  const detector = createDetector({ judge });
+  const early = await detector.observe(lines.slice(0, 14)); // two lines after the pocket: still growing
+  assert.equal(early.open.from, 10);
+  assert.equal(early.closed.length, 0);
+  assert.equal(early.newest.index, 13);
+  const later = await detector.observe(lines);
+  assert.equal(later.open, null);
+  assert.deepEqual(shapeOf(later), [[10, 11]]);
+});
+
+test("the duration filters reject a read too short to bother and one too long to skip", async () => {
+  const short = flatLines(20);
+  const shortDetector = createDetector({ judge: judgeFrom(new Set(["L005", "L006"])) });
+  const shortObserved = await shortDetector.observe(short);
+  assert.equal(await shortDetector.refine(shortObserved.closed[0]), null); // 12 s
+
+  const long = flatLines(70);
+  const longDetector = createDetector({ judge: judgeFrom((index) => index <= 55) }); // 56 lines, then quiet
+  await longDetector.observe(long); // the per-call cap, drained
+  const longObserved = await longDetector.observe(long);
+  assert.equal(longObserved.open, null);
+  assert.equal(await longDetector.refine(longObserved.closed[0]), null); // 336 s
+});
+
+test("the detector gives the same answer fed in portions as in one pass", async () => {
+  const lines = fixture.lines;
+  const inside = (index) => {
+    const at = lines[index].startMs;
+    return fixture.expected.reads.some((read) => at >= read.startMs && at < read.endMs);
+  };
+  const onePass = await createDetector({ judge: judgeFrom(inside) }).observe(lines);
+
+  const detector = createDetector({ judge: judgeFrom(inside) });
+  let portions = null;
+  for (let n = 5; n < lines.length; n += 5) portions = await detector.observe(lines.slice(0, n));
+  portions = await detector.observe(lines);
+
+  assert.deepEqual(shapeOf(portions), shapeOf(onePass));
+  assert.equal(portions.closed.length, 2); // both labelled reads
 });
 
 test("parseJson3 and parseVtt produce cues", () => {
@@ -225,18 +270,6 @@ test("detectSponsors returns nothing for a transcript without reads", async () =
   const judge = stubJudge((cards) => cards.map(() => 0.05));
   const result = await detectSponsors({ video: fixture.video, lines: fixture.lines, judge });
   assert.deepEqual(result.reads, []);
-});
-
-test("refineCandidate rejects a read that is too long to skip safely", async () => {
-  const judge = stubJudge((cards) => cards.map(() => 0.95));
-  const read = await refineCandidate({ lines: fixture.lines, run: { from: 0, to: 49 }, judge, settings: { maxReadMs: 60000 } });
-  assert.equal(read, null);
-});
-
-test("refineCandidate rejects a read that is too short to bother", async () => {
-  const judge = stubJudge((cards) => cards.map(() => 0.95));
-  const read = await refineCandidate({ lines: fixture.lines, run: { from: 10, to: 11 }, judge, settings: { minReadMs: 120000 } });
-  assert.equal(read, null);
 });
 
 test("the pipeline falls back to the code heuristic when the judge does", async () => {

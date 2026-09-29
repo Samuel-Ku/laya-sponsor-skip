@@ -67,8 +67,10 @@ does the seeking.
    asked about with the sharper questions, the lead-in is walked back line by line, and
    a boundary is only cut above `P ≥ 0.80` (upstream's phrase rule). Reads shorter than
    20 s are dropped, reads longer than 3 minutes are **not** skipped at all, at most 6
-   per video — and the live loop and the Analyze button cross this same derivation, so
-   a rule added to one is a rule both get.
+   per video. All of that lives behind one interface in `src/detector.js` —
+   `createDetector({ judge, settings })` with `observe(lines)`, `refine(run)` and
+   `reset()` — which the live loop drives as captions arrive and which `detectSponsors()`
+   drives over a whole transcript at once, so a rule added to one is a rule both get.
 5. **Act (code)** – a read is skipped by setting `video.currentTime` to the first line
    that reads as content again. While a read is still open, the video steps forward by
    10 s at a time as long as the newest line still reads as a read — the same trade the
@@ -223,7 +225,7 @@ Sponsor reads of different shapes, plus two controls:
 | `aircAruvnKk` — 3Blue1Brown | SponsorBlock segment over a **wordless outro** — no captions in it at all | 18:26–18:53 | ⏭️ skipped, unjudgable | ⏭️ skipped, unjudgable |
 | `JwAfHEHQKto` — control | no sponsor segment | — | ✅ silent | ❌ 6 false reads |
 | `rS7scGrFsRo` — control | no sponsor segment | — | ✅ silent | ❌ 1 false read |
-| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (388 live calls, 255 batch) | **1/4 found · 23 false positives · controls 0/2 clean** (508 live calls, 351 batch) |
+| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (388 live calls, 267 batch) | **1/4 found · 23 false positives · controls 0/2 clean** (508 live calls, 363 batch) |
 
 The two runs differ in one thing only: who answered the questions.
 

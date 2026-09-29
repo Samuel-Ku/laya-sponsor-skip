@@ -23,6 +23,19 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
 - `pageOf(video)` threw when the caller had no page, which sent every verdict to
   the code heuristic while the run still reported the server's model name.
 
+### Changed
+
+- **One module owns read detection.** The verdict for every line, how far the
+  transcript has been judged, the bridge, the edge walk and the duration filters all
+  sit behind one interface in `src/detector.js` — `createDetector({ judge, settings })`
+  with `observe(lines)`, `refine(run)` and `reset()` — and both paths cross it: the
+  live loop as captions arrive, `detectSponsors()` over a whole transcript. The loop
+  keeps what is its own: the player, the panel, and the decision to step over an open
+  run. The duplicated verdict map and run grouping in `src/content.js` are gone, and
+  so are the `refineCandidate`/`groupRuns` tests that measured internals. Driving the
+  batch pass through the same interface costs it 12 more local calls across the six
+  real videos (255 → 267, with the same 2990 questions and the same results).
+
 ### Added
 
 - **`npm run real-check`** — six real videos whose transcripts are the videos' own

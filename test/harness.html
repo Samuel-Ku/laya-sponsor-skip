@@ -62,8 +62,8 @@
   <script type="module">
     import { createPanel } from "../src/panel.js";
     import { indexLines, msToLabel } from "../src/transcript.js";
-    import { detectSponsors, heuristicProbabilities, makeJudge } from "../src/sponsor.js";
-    import { DEFAULTS as PIPELINE_DEFAULTS } from "../src/sponsor.js";
+    import { detectSponsors, DEFAULTS as PIPELINE_DEFAULTS } from "../src/detector.js";
+    import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
     import { judgeBatch } from "../src/laya.js";
     import { parsePastedTranscript } from "../src/transcript.js";
 

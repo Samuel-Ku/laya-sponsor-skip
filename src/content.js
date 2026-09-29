@@ -12,8 +12,8 @@
 // the read is confirmed. Everything after that is a jump that code decided.
 
 import { mergeCues, msToLabel, parsePastedTranscript } from "./transcript.js";
-import { DEFAULTS as SPONSOR_DEFAULTS, detectSponsors, judgeIndices, makeJudge, refineCandidate } from "./sponsor.js";
-import { deriveRuns } from "./detector.js";
+import { makeJudge } from "./sponsor.js";
+import { createDetector, DEFAULTS as SPONSOR_DEFAULTS, detectSponsors } from "./detector.js";
 import { createPanel, showToast } from "./panel.js";
 import * as yt from "./youtube.js";
 
@@ -32,10 +32,6 @@ const DEFAULTS = {
 
 const CAPTURE_MS = 250;
 const TICK_MS = 2500;
-// Local decisions are ~10 ms each, so a tick can afford to judge every new line and
-// stay close behind the captions. Judging lazily made a partially judged read look
-// like a whole one, and the refinement then locked the narrow version in.
-const MAX_NEW_LINES_PER_TICK = 40;
 const LOG_LIMIT = 400;
 
 const state = {
@@ -43,8 +39,7 @@ const state = {
   videoId: null,
   cues: [],
   lines: [],
-  flags: new Map(), // line index (0-based) -> P(inside a read)
-  judgedUpTo: 0,
+  newest: { index: -1, p: 0 }, // the verdict on the line judged last
   openRead: null,
   reads: [],
   log: [],
@@ -118,6 +113,20 @@ function currentJudge() {
   return makeJudge({ video: yt.videoMeta(), transport: makeTransport(), log: pushLog });
 }
 
+/**
+ * The detector holds the verdict for every line of this video, so dropping it is
+ * how the loop forgets: another video, a threshold the user moved, a re-analyze.
+ */
+let detector = null;
+function currentDetector() {
+  if (!detector) detector = createDetector({ judge: currentJudge(), settings: settingsForPipeline(), log: pushLog });
+  return detector;
+}
+
+function forgetReads() {
+  detector = null;
+}
+
 // ---------- capture ----------
 
 /** Read the caption that is on screen right now and keep it as a cue. */
@@ -145,62 +154,6 @@ function captureCaption() {
 
 // ---------- judging ----------
 
-async function judgeNewLines(lines) {
-  const from = Math.max(0, state.judgedUpTo - 1); // the tail line keeps growing
-  const upto = Math.min(lines.length - 1, from + MAX_NEW_LINES_PER_TICK);
-  const indices = [];
-  for (let i = from; i <= upto; i++) indices.push(i);
-  if (!indices.length) return;
-  const probs = await judgeIndices(currentJudge(), lines, indices, "inside", { log: pushLog, settings: settingsForPipeline() });
-  for (const [index, p] of probs) state.flags.set(index, p);
-  state.judgedUpTo = Math.max(state.judgedUpTo, upto + 1);
-}
-
-/**
- * What we know about each line: yes, no, or `null` while nobody has judged it.
- * The detector needs that third value: a read may bridge a quiet middle it has
- * heard, and must not bridge one it has not.
- */
-function verdicts(lines) {
-  return lines.map((_, i) => {
-    const p = state.flags.get(i);
-    return p == null ? null : p >= state.settings.threshold;
-  });
-}
-
-/**
- * Every candidate run the detector finds — the same derivation the batch pass
- * uses, bridge included — plus the one at the tail of the transcript if it is
- * still open. We may be inside it right now, which is the live counterpart of the
- * audio modes upstream: the end is not known until the speaker is done.
- */
-function runs(lines) {
-  const found = deriveRuns(lines, verdicts(lines));
-
-  state.openRead = null;
-  const closedRuns = found.slice();
-  const tail = found[found.length - 1];
-  if (tail) {
-    // "Settled" means three quiet lines that have actually been judged — otherwise a
-    // run that is still growing looks finished simply because nobody asked yet.
-    const judgedTo = Math.min(state.judgedUpTo - 1, lines.length - 1);
-    const settled = judgedTo - tail.to >= 3;
-    if (!settled && yt.isPlaying()) {
-      closedRuns.pop();
-      state.openRead = {
-        key: `open-${tail.from}`,
-        open: true,
-        startMs: lines[tail.from].startMs,
-        startLine: lines[tail.from].index,
-        endLine: lines[tail.to].index,
-        confidence: Math.max(0, ...[...state.flags.entries()].filter(([i]) => i >= tail.from && i <= tail.to).map(([, p]) => p)),
-        run: tail,
-      };
-    }
-  }
-  return closedRuns;
-}
-
 function overlaps(a, b) {
   const shared = Math.min(a.endMs, b.endMs) - Math.max(a.startMs, b.startMs);
   const shorter = Math.min(a.endMs - a.startMs, b.endMs - b.startMs);
@@ -208,8 +161,27 @@ function overlaps(a, b) {
 }
 
 async function updateReads(lines) {
-  const closed = runs(lines);
-  for (const run of closed) {
+  const detector_ = currentDetector();
+  const { closed, open, newest } = await detector_.observe(lines);
+  state.newest = newest;
+
+  // An open run is one whose end nobody knows yet — the speaker may still be
+  // inside it. While the video plays we leave it alone and jump over it by ear; a
+  // paused or finished video is the moment to walk its edges like any other run.
+  const playing = yt.isPlaying();
+  state.openRead = open && playing
+    ? {
+        key: `open-${open.from}`,
+        open: true,
+        startMs: lines[open.from].startMs,
+        startLine: lines[open.from].index,
+        endLine: lines[open.to].index,
+        confidence: open.score,
+        run: open,
+      }
+    : null;
+
+  for (const run of open && !playing ? [...closed, open] : closed) {
     // The same cap the batch pass applies: `maxReads` is a documented limit on
     // what this extension will skip in one video, and it is worth nothing if only
     // the Analyze button honours it.
@@ -222,7 +194,7 @@ async function updateReads(lines) {
     if (state.refining.has(key) || state.reads.some((read) => overlaps(read, run_))) continue;
     state.refining.add(key);
     try {
-      const read = await refineCandidate({ lines, run, judge: currentJudge(), settings: settingsForPipeline(), log: pushLog });
+      const read = await detector_.refine(run);
       if (read) {
         state.reads.push(read);
         state.reads.sort((a, b) => a.startMs - b.startMs);
@@ -233,7 +205,7 @@ async function updateReads(lines) {
       state.refining.delete(key);
     }
   }
-  await maybeStepWhileInside(lines);
+  await maybeStepWhileInside();
 }
 
 /**
@@ -241,7 +213,7 @@ async function updateReads(lines) {
  * reads as sponsor, step over the read. Only ever forward, only while the line
  * just heard says yes, and never past `maxReadSeconds`.
  */
-async function maybeStepWhileInside(lines) {
+async function maybeStepWhileInside() {
   const open = state.openRead;
   if (!open) return;
   const elapsed = yt.currentTimeMs() - open.startMs;
@@ -250,8 +222,9 @@ async function maybeStepWhileInside(lines) {
     state.openRead = null;
     return;
   }
-  const tailIndex = Math.max(0, Math.min(state.judgedUpTo, lines.length) - 1);
-  const tailP = state.flags.get(tailIndex) ?? 0;
+  // The verdict on the line judged last: "am I hearing a read right now".
+  const tailP = state.newest.p;
+
   // The read gate, not the boundary gate: stepping only ever moves forward, and the
   // worst case is overshooting the read's end by one step. Starting to jump early is
   // the dangerous direction, and that one stays at cutThreshold.
@@ -347,8 +320,7 @@ function usePastedTranscript(text) {
   state.source = "paste";
   state.cues = parsed.cues;
   state.lines = parsed.lines;
-  state.flags = new Map();
-  state.judgedUpTo = 0;
+  forgetReads();
   state.reads = [];
   state.openRead = null;
   for (const warning of parsed.warnings) pushLog({ kind: "paste", verdict: warning });
@@ -405,8 +377,7 @@ function cacheReads() {
 }
 
 async function reanalyze() {
-  state.flags = new Map();
-  state.judgedUpTo = 0;
+  forgetReads();
   state.reads = [];
   state.openRead = null;
   state.log = [];
@@ -443,7 +414,6 @@ async function tick() {
   if (state.lines.length === 0) return;
   state.busy = true;
   try {
-    if (state.lines.length > state.judgedUpTo + 1) await judgeNewLines(state.lines);
     await updateReads(state.lines);
     if (state.reads.length && render._saved !== JSON.stringify(state.reads.map((r) => [r.startMs, r.endMs, r.skipped]))) {
       render._saved = JSON.stringify(state.reads.map((r) => [r.startMs, r.endMs, r.skipped]));
@@ -462,10 +432,9 @@ function resetForVideo() {
   const videoId = yt.parseVideoId();
   if (videoId === state.videoId) return;
   state.videoId = videoId;
+  forgetReads();
   state.cues = [];
   state.lines = [];
-  state.flags = new Map();
-  state.judgedUpTo = 0;
   state.openRead = null;
   state.reads = [];
   state.log = [];
@@ -498,6 +467,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
   for (const [key, { newValue }] of Object.entries(changes)) {
     if (key in DEFAULTS) state.settings[key] = newValue;
   }
+  // A threshold the user moved changes what counts as a yes, and the detector
+  // was built with the old one: drop it and let the next tick build it again.
+  forgetReads();
   render();
 });
 
