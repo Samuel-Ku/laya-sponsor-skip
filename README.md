@@ -148,10 +148,14 @@ npm test
 npm run live-check
 node test/live-check.mjs --fake       # no server at all: code heuristic answers
 
-# 3) the panel and the pipeline in a browser, with a fake video and Skip buttons
+# 3) six real videos, scored against the SponsorBlock labels inside the fixtures
+npm run real-check
+npm run real-check -- --fake
+
+# 4) the panel and the pipeline in a browser, with a fake video and Skip buttons
 npm run serve          # then: http://localhost:8788/test/harness.html
 
-# 4) the live path: the real content script on a fake player (stubbed chrome API)
+# 5) the live path: the real content script on a fake player (stubbed chrome API)
 #                        http://localhost:8788/test/live-harness.html
 ```
 
@@ -179,6 +183,69 @@ With the real multilingual checkpoint the boundaries should tighten: the heurist
 cannot answer the "is the read over here?" question at all, so its ends can be a
 line late, and its starts stop one line early.
 
+### Real videos
+
+`npm run real-check` runs the same pipeline over six real videos and scores it against
+the community labels:
+
+```bash
+npm run real-check              # marks against whatever answers on 127.0.0.1:8765
+npm run real-check -- --fake    # no server: the code heuristic answers
+```
+
+Each fixture in `test/fixtures/real/` is one video: the **video's own captions**,
+captured with `scripts/fetch-real-fixtures.mjs` (the player response's `timedtext`
+track, merged with the extension's own `mergeCues`), plus the video's **`sponsor`
+segments from the SponsorBlock API**, kept as ground truth. A reported read is matched
+to the segment it overlaps most (one-to-one); a read that overlaps no segment counts as
+a false positive, a segment that no read overlaps counts as a miss, and a video whose
+labels are empty is a control that must stay silent. The judge is whatever the server
+reports: with a checkpoint loaded the run is **strict** (any miss or false positive
+exits 1), with no checkpoint it measures the code heuristic and says so.
+
+Sponsor reads of different shapes, plus two controls:
+
+| Video | The read | SponsorBlock | Code stand-in (`--fake`) | Judge on 8765 |
+| --- | --- | --- | --- | --- |
+| `CLkMCNkwCjI` — UltimateiDeviceVids | Surfshark VPN: mid-roll with a spoken intro and a thank-you outro | 2:42–4:09 | ✅ 2:52–4:06 (start +9.9 s, end −3.6 s) | ✅ 2:34–4:03 (−8.1 s, −5.8 s) + 3 false reads |
+| `brqtaTjBkB0` — Hardware Canucks | Drop: named sponsor, "a quick word from today's video sponsor" … "check it out down below" | 6:16–6:54 | ✅ 6:16–7:10 (start +0.5 s, end +16.0 s) | ❌ missed + 5 false reads |
+| `cBpGq-vDr2Y` — Marques Brownlee | Eight Sleep: a personal-story read whose offer is compressed into a single "use code" line | 22:40–23:50 | ❌ missed | ✅ 22:57–24:37 (+16.4 s, +46.8 s) + 4 false reads |
+| `aircAruvnKk` — 3Blue1Brown | SponsorBlock segment over a **wordless outro** — no captions in it at all | 18:26–18:53 | ⏭️ skipped, unjudgable | ⏭️ skipped, unjudgable |
+| `JwAfHEHQKto` — control | no sponsor segment | — | ✅ silent | ❌ 4 false reads |
+| `rS7scGrFsRo` — control | no sponsor segment | — | ✅ silent | ❌ 2 false reads |
+| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (133 calls, 758 questions) | **2/4 found · 22 false positives · controls 0/2 clean** (238 calls, 1041 questions) |
+
+The two runs differ in one thing only: who answered the questions.
+
+**The code stand-in** is honest about being a phrase dictionary, and it shows: it nails
+the two reads that announce themselves ("sponsored by", "today's sponsor", "use code")
+and never fires on the two controls, but it misses the MKBHD read, where the sponsor is
+introduced as a mattress the reviewer has *been using* and the price is mentioned once —
+there is no phrase in the read to match, which is precisely the gap a model is supposed
+to fill. Its boundaries are a line off: the start stops one line early because the
+heuristic cannot answer "is the read over here?".
+
+**The judge on `127.0.0.1:8765`** in this environment was `server_bert.py`, which serves
+`bondarchukb/bert-ads-classification` on `mps` — a stand-in that never reads the
+`questions` or `criteria` from the request and instead verbalizes each candidate as a
+**DOM ad slot** ("Visible text: …", IAB sizes, disclosure labels). It is answering *"does
+this text look like an advertisement?"*, not *"is this spoken line inside a sponsor read?"*,
+and the answers are noise for this task: it scores `this video is sponsored by surfshark vpn`
+at **0.06** and `so the question is whether this deal is actually worth it for most people`
+at **0.999**. The pipeline then does the only thing it can — it skips what the judge
+points at — which is why that column has 22 false positives and why the run exits red.
+Those numbers measure the stand-in, not the pipeline: with a checkpoint that answers the
+narrow question, the same four segments are the ones to beat.
+
+Two things came out of writing this harness, and both are now enforced rather than
+noted. A run that silently fell back to the code heuristic used to print numbers that
+looked like the model's; a fallback is now a hard failure with the failing call in the
+summary. And `makeJudge` used to lose the judge whenever the caller passed no video
+metadata — `pageOf(video)` threw before the transport was ever called, so every verdict
+came from the heuristic while the summary still named the server's model — so
+`pageOf` now treats a missing page as an empty one, and the harness reports the address
+it actually called together with the number of local calls.
+
 ## What leaves your browser
 
 Per batch, one request to `127.0.0.1` containing the video's title, channel and id
@@ -198,6 +265,10 @@ except the optional **Compare with SponsorBlock** button, which asks
   line late while a read is still open (the 10 s step in live mode).
 - **ASR mangles brand names**, so the questions describe a read by its shape — lead-in,
   pitch, offer — rather than by the sponsor's name.
+- **A judge that answers a different question is worse than no judge.** The fallback
+  triggers on a failed call or on `heuristic` in the model name; a server serving some
+  other classifier reports neither, and its verdicts are believed. Check the model name
+  in the panel — see [Real videos](#real-videos) for what that costs.
 - **A whole read is skipped or none of it is.** A read longer than 3 minutes is not
   skipped at all: skipping that much of a video on a probability is not worth the risk.
 - The transcript only grows as the video plays. Watching a 20-minute video from the

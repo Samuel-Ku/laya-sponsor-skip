@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { formatLines, groupRuns, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
-import { CRITERIA, DEFAULTS, detectSponsors, heuristicProbabilities, lineCard, pageOf, questionsFor, refineCandidate } from "../src/sponsor.js";
+import { CRITERIA, DEFAULTS, detectSponsors, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor, refineCandidate } from "../src/sponsor.js";
 import { MAX_CANDIDATES_PER_REQUEST, buildRequest, isHeuristic, parseResponse } from "../src/laya.js";
 
 const fixtureJson = JSON.parse(readFileSync(new URL("./fixtures/demo-transcript.json", import.meta.url), "utf8"));
@@ -210,4 +210,26 @@ test("the pipeline falls back to the code heuristic when the judge does", async 
     assert.ok(Math.abs(result.reads[i].startMs - expected.startMs) <= fixture.expected.startToleranceMs);
     assert.ok(Math.abs(result.reads[i].endMs - expected.endMs) <= fixture.expected.endToleranceMs);
   }
+});
+
+test("a missing video page never costs a judge call", async () => {
+  // The eval harness runs the pipeline with no live page, and a page that threw
+  // before the transport was reached used to turn every verdict into the code
+  // heuristic while the run still reported the server's model name.
+  let calls = 0;
+  let sent = null;
+  const judge = makeJudge({
+    video: null,
+    transport: async ({ state, candidates }) => {
+      calls++;
+      sent = state.page;
+      return { probabilities: candidates.map((_, i) => (i % 2 ? 0.1 : 0.9)), model: "stub" };
+    },
+  });
+  const answers = await judge({ cards: [{ text: "a" }, { text: "b" }], questions: [] });
+  assert.equal(calls, 1);
+  assert.equal(answers.heuristic, false);
+  assert.deepEqual(answers.probabilities, [0.9, 0.1]);
+  assert.equal(sent.host, "youtube.com");
+  assert.equal(pageOf(null).title, "");
 });

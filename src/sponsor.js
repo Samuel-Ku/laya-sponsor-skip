@@ -86,13 +86,17 @@ export function lineCard(lines, index, { radius = 1, textLimit = TEXT_LIMIT, con
 }
 
 /** What the model is allowed to see about the video itself. */
-export function pageOf(video = {}) {
+export function pageOf(video) {
+  // Callers may legitimately have no metadata yet (the eval harness runs the
+  // pipeline without a live page), and a missing page must not be the reason a
+  // judge call never happens.
+  const v = video ?? {};
   return {
     host: "youtube.com",
-    title: cut(video.title || "", 120),
-    channel: cut(video.channel || "", 60),
-    videoId: video.videoId,
-    duration: video.durationMs ? msToLabel(video.durationMs) : undefined,
+    title: cut(v.title || "", 120),
+    channel: cut(v.channel || "", 60),
+    videoId: v.videoId,
+    duration: v.durationMs ? msToLabel(v.durationMs) : undefined,
   };
 }
 
@@ -127,10 +131,10 @@ export function makeJudge({ video, transport, log = () => {} }) {
 const HEURISTIC = {
   // Phrases that only ever introduce or close a paid read.
   hard:
-    /(this (video|episode|show|stream|segment|portion|part)( of the video)? is (sponsored|brought to you|presented) by|sponsored by|brought to you by|sponsor of (this|today'?s) (video|episode)|thank(s| you) to [\w\s'&.-]{2,40} for sponsoring|sponsoring (this|today'?s) (video|episode)|link (is )?in the (description|bio|show notes)|use (my|our|the) code|\bcode [A-Z0-9]{1,11}\d[A-Z0-9]{0,4}\b|head to [\w-]+ ?(dot|\.) ?(com|io|net|co|org|gg)|go to [\w-]+ ?(dot|\.) ?(com|io|net|co|org|gg)|sign ?up (today|now|with)|first \d{1,3} (people|users|subscribers|listeners))/i,
+    /(this (video|episode|show|stream|segment|portion|part)( of the video)? is (sponsored|brought to you|presented) by|sponsored by|brought to you by|sponsor of (this|today'?s) (video|episode)|(our|the|this|today'?s) (video|episode)('s)? sponsor\b|\b(today'?s|this) sponsor\b|a (great|longtime|long-time) sponsor\b|thank(s| you) to [\w\s'&.-]{2,40} for sponsoring|sponsoring (this|today'?s) (video|episode)|link (is )?(in|down below in) the (description|bio|show notes)|(leave|drop) a link (to|in|down|below)|check (it|this) out (down )?below|link (is )?down below|use (my|our|the )?code|\bcode [A-Z0-9]{1,11}\d[A-Z0-9]{0,4}\b|\$\d{1,4}(\.\d+)? off|head to [\w-]+ ?(dot|\.) ?(com|io|net|co|org|gg)|go to [\w-]+ ?(dot|\.) ?(com|io|net|co|org|gg)|sign ?up (today|now|with)|first \d{1,3} (people|users|subscribers|listeners))/i,
   // Marketing-shaped phrases: a hint of a read, not proof of one.
   soft:
-    /(before we (get started|begin|dive in|jump in)|quick (word|break|message|note)|let me tell you about|we'?re back|now,? back to|support(ed)? (for|by)|our partners?|a word from|(our|the|their) sponsor\b|promo ?code|discount code|coupon|(ten|fifteen|twenty|twenty-five|thirty|forty|fifty) percent off|\d{1,2}% off|save \d{1,2}%|free (trial|month|shipping|version))/i,
+    /(before we (get started|begin|dive in|jump in)|quick (word|break|message|note)|let me tell you about|we'?re back|now,? back to|support(ed)? (for|by)|our partners?|a word from|(our|the|their) sponsor\b|promo ?code|discount code|coupon|(ten|fifteen|twenty|twenty-five|thirty|forty|fifty) percent off|\d{1,2}% off|save \d{1,2}%|free (trial|month|shipping|version)|\b[\w-]+\.(com|io|net|co|org)\b)/i,
   // Spelled out in the criteria: these are not sponsor reads.
   notSponsor:
     /(like and subscribe|hit the (bell|like)|leave a (comment|like)|comment below|subscribe to (my|the)? ?channel|patreon|join this channel|merch (store|shop|link|line)|membership)/i,
@@ -139,8 +143,14 @@ const HEURISTIC = {
 const NOT_SPONSOR_SCORE = 0.07;
 // A neighbour that looks like a read is a hint at a discount — a read is a run of
 // lines, and the pitch lines in the middle name nothing — but the line's own
-// words always win, so a subscribe line never gets pulled into a read.
-const CONTEXT_WEIGHT = 0.8;
+// words always win, so a subscribe line never gets pulled into a read. The hint
+// is asymmetric on purpose, and the directions matter: `after` is the text of the
+// NEXT line, so a high weight there grows a read backwards out of its offer (the
+// approach to a seed line is still the read), while `before` — the previous
+// line's text — stays half-weight, because what follows a finished offer is
+// usually the video's own content again.
+const CONTEXT_WEIGHT = 0.5;
+const CONTEXT_WEIGHT_AFTER = 0.8;
 
 function scoreText(text) {
   const t = String(text || "");
@@ -162,8 +172,10 @@ export function heuristicProbabilities(cards) {
   return cards.map((card) => {
     const own = scoreText(card?.text);
     if (own === NOT_SPONSOR_SCORE) return own; // spelled out as not a sponsor: no hint overrides that
-    const around = scoreText(`${card?.before || ""} ${card?.after || ""}`);
-    return clamp(Number(Math.max(own, around * CONTEXT_WEIGHT).toFixed(3)), 0.01, 0.98);
+    const before = scoreText(card?.before || "");
+    const after = scoreText(card?.after || "");
+    const hinted = Math.max(own, before * CONTEXT_WEIGHT, after * CONTEXT_WEIGHT_AFTER);
+    return clamp(Number(hinted.toFixed(3)), 0.01, 0.98);
   });
 }
 
@@ -319,7 +331,27 @@ export async function detectSponsors({ video, lines, judge, settings = {}, log =
   const flags = flagsFromRuns(lines, sampled, opts.threshold);
   const lineMs = medianLineMs(lines);
   const minRun = Math.max(2, Math.min(4, Math.round(opts.minReadMs / lineMs)));
-  let runs = groupRuns(flags, { minRun });
+  // Keep even one-line runs here — the bridge below may be what makes a short
+  // pair of phrase-pockets worth judging; the length gate is applied after.
+  let runs = groupRuns(flags, { minRun: 1 });
+
+  // Merge runs separated by a short gap of unflagged lines: a read is a lead-in,
+  // a pitch and an offer, and the pitch's middle often carries no sales phrases —
+  // it is the shape (selling continues across an unbroken pocket of plain text)
+  // that marks it, and that shape is code-owned. Refinement still asks about the
+  // edges, so for the model this bridge can only ever widen a candidate, never
+  // move a boundary; the lead-in walk-back stays the honest way to grow a start.
+  const bridgeLines = Math.max(3, Math.min(12, Math.round(60000 / Math.max(lineMs, 1))));
+  const bridged = [];
+  for (const run of runs) {
+    const prev = bridged[bridged.length - 1];
+    if (prev && run.from - prev.to - 1 <= bridgeLines) {
+      prev.to = run.to; // runs arrive position-sorted, so the earlier one absorbs the later
+    } else {
+      bridged.push({ ...run });
+    }
+  }
+  runs = bridged.filter((run) => run.to - run.from + 1 >= minRun);
 
   // Pass 2 — walk the edges of the most likely runs.
   const scored = runs

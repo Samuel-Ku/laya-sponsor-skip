@@ -1,0 +1,2375 @@
+{
+  "video": {
+    "videoId": "cBpGq-vDr2Y",
+    "title": "iPhone 15 Pro Review: The Good, The Bad, & The Ugly!",
+    "channel": "Marques Brownlee",
+    "durationMs": 1481000
+  },
+  "track": {
+    "languageCode": "en",
+    "kind": "manual"
+  },
+  "sponsorblock": [
+    {
+      "startMs": 1360154,
+      "endMs": 1430460,
+      "category": "sponsor",
+      "votes": 11
+    }
+  ],
+  "note": "review, late read",
+  "lines": [
+    {
+      "index": 1,
+      "startMs": 327,
+      "endMs": 1350,
+      "text": "- You know what's funny?"
+    },
+    {
+      "index": 2,
+      "startMs": 1350,
+      "endMs": 5820,
+      "text": "When there is not that many changes, it really puts a magnifying glass"
+    },
+    {
+      "index": 3,
+      "startMs": 5820,
+      "endMs": 8643,
+      "text": "on the few changes that there actually are."
+    },
+    {
+      "index": 4,
+      "startMs": 10050,
+      "endMs": 15390,
+      "text": "Have you ever listened to a car reviewer describe the latest generation Porsche 911?"
+    },
+    {
+      "index": 5,
+      "startMs": 15390,
+      "endMs": 18270,
+      "text": "Like, this is a car that's looked more or less the same"
+    },
+    {
+      "index": 6,
+      "startMs": 18270,
+      "endMs": 23820,
+      "text": "for the past 50 years with slight evolutions with each new generation."
+    },
+    {
+      "index": 7,
+      "startMs": 23820,
+      "endMs": 28657,
+      "text": "And literally, every time you watch or read a review, they always say every single time,"
+    },
+    {
+      "index": 8,
+      "startMs": 28657,
+      "endMs": 34118,
+      "text": "\"Oh, it's so refined, oh, this is an engineering masterpiece that's been perfected over generations."
+    },
+    {
+      "index": 9,
+      "startMs": 34118,
+      "endMs": 37830,
+      "text": "It's a formula that's been developed in the same direction for years.\""
+    },
+    {
+      "index": 10,
+      "startMs": 37830,
+      "endMs": 41676,
+      "text": "I actually, as a kid, I used to actively dislike Porsches because I just,"
+    },
+    {
+      "index": 11,
+      "startMs": 41676,
+      "endMs": 44190,
+      "text": "I knew they were expensive, but I thought they're all so boring,"
+    },
+    {
+      "index": 12,
+      "startMs": 44190,
+      "endMs": 45390,
+      "text": "they all look like the same thing."
+    },
+    {
+      "index": 13,
+      "startMs": 45390,
+      "endMs": 47820,
+      "text": "Why would you get one of those, when you could get"
+    },
+    {
+      "index": 14,
+      "startMs": 47820,
+      "endMs": 52206,
+      "text": "a way more exciting Ferrari or McLaren instead?"
+    },
+    {
+      "index": 15,
+      "startMs": 52206,
+      "endMs": 59280,
+      "text": "But as I've gotten older, I can appreciate the Porsche formula a little more."
+    },
+    {
+      "index": 16,
+      "startMs": 59280,
+      "endMs": 61920,
+      "text": "I don't love it or anything, I wouldn't say I love it,"
+    },
+    {
+      "index": 17,
+      "startMs": 61920,
+      "endMs": 66330,
+      "text": "but I can appreciate it more, does that make sense?"
+    },
+    {
+      "index": 18,
+      "startMs": 66330,
+      "endMs": 67530,
+      "text": "I hope that makes sense."
+    },
+    {
+      "index": 19,
+      "startMs": 68411,
+      "endMs": 70405,
+      "text": "♪ Bling ♪ ♪ I am the one at optimum ♪"
+    },
+    {
+      "index": 20,
+      "startMs": 70405,
+      "endMs": 72268,
+      "text": "♪ I got the drum, I got the drop on 'em ♪"
+    },
+    {
+      "index": 21,
+      "startMs": 72268,
+      "endMs": 74302,
+      "text": "♪ I got the lock, stock and barrel on top of them ♪"
+    },
+    {
+      "index": 22,
+      "startMs": 74302,
+      "endMs": 76359,
+      "text": "♪ I got the chopper for the block they knocking on ♪"
+    },
+    {
+      "index": 23,
+      "startMs": 76359,
+      "endMs": 79419,
+      "text": "♪ Act tion tion ♪ ♪ Look at the crowd, the way they packed in in ♪"
+    },
+    {
+      "index": 24,
+      "startMs": 79419,
+      "endMs": 81297,
+      "text": "♪ Lone wolf hear the howl, where the pack then then ♪"
+    },
+    {
+      "index": 25,
+      "startMs": 81297,
+      "endMs": 87222,
+      "text": "♪ Is he packing then ♪ ♪ Shooting off at the mouth like rat tat tat bling ♪"
+    },
+    {
+      "index": 26,
+      "startMs": 92303,
+      "endMs": 95483,
+      "text": "♪ Anybody in a pine for life ♪ ♪ Your size ain't nothing for you to die for ♪"
+    },
+    {
+      "index": 27,
+      "startMs": 95483,
+      "endMs": 102080,
+      "text": "♪ All up in my eye for ♪ This is the iPhone 15 Pro."
+    },
+    {
+      "index": 28,
+      "startMs": 103200,
+      "endMs": 105513,
+      "text": "Not a lot of changes."
+    },
+    {
+      "index": 29,
+      "startMs": 106447,
+      "endMs": 109350,
+      "text": "(logo whooshing) So, okay, I think people gotta get this thought"
+    },
+    {
+      "index": 30,
+      "startMs": 109350,
+      "endMs": 113100,
+      "text": "out of their head that you've gotta upgrade every year to the newest phone."
+    },
+    {
+      "index": 31,
+      "startMs": 113100,
+      "endMs": 117060,
+      "text": "Like, I realize most of us already know this, but for some reason, people are still stuck on this thing"
+    },
+    {
+      "index": 32,
+      "startMs": 117060,
+      "endMs": 121530,
+      "text": "where they say, \"Oh, last year's phone is barely different from this year's phone,"
+    },
+    {
+      "index": 33,
+      "startMs": 121530,
+      "endMs": 126960,
+      "text": "it's not worth upgrading.\" But like, that's not new, like the Zenfone 10 I just reviewed"
+    },
+    {
+      "index": 34,
+      "startMs": 126960,
+      "endMs": 129390,
+      "text": "is just a refinement of Zenfone 9."
+    },
+    {
+      "index": 35,
+      "startMs": 129390,
+      "endMs": 132780,
+      "text": "Like the bleeding edge ROG phone has looked the same for three years now,"
+    },
+    {
+      "index": 36,
+      "startMs": 132780,
+      "endMs": 134880,
+      "text": "the Pixel is finding its stride with design."
+    },
+    {
+      "index": 37,
+      "startMs": 134880,
+      "endMs": 140340,
+      "text": "But what we're really looking for is for them to fix anything that's wrong or bad,"
+    },
+    {
+      "index": 38,
+      "startMs": 140340,
+      "endMs": 145200,
+      "text": "and then just find ways, clever ways, good, interesting ways to just get a little bit better every year,"
+    },
+    {
+      "index": 39,
+      "startMs": 145200,
+      "endMs": 149400,
+      "text": "so that over a long time, over a bunch of improvements,"
+    },
+    {
+      "index": 40,
+      "startMs": 149400,
+      "endMs": 153120,
+      "text": "it adds up to a bigger, more significant change."
+    },
+    {
+      "index": 41,
+      "startMs": 153120,
+      "endMs": 156090,
+      "text": "So that's what's happening here with this iPhone 15 Pro."
+    },
+    {
+      "index": 42,
+      "startMs": 156090,
+      "endMs": 157530,
+      "text": "I've been using it for about two weeks now."
+    },
+    {
+      "index": 43,
+      "startMs": 157530,
+      "endMs": 162960,
+      "text": "They've made some improvements, but now we're starting to also see some possible problems,"
+    },
+    {
+      "index": 44,
+      "startMs": 162960,
+      "endMs": 167640,
+      "text": "some new issues that have risen up, so let's talk about it."
+    },
+    {
+      "index": 45,
+      "startMs": 167640,
+      "endMs": 169920,
+      "text": "So there's basically four new features they've added here."
+    },
+    {
+      "index": 46,
+      "startMs": 169920,
+      "endMs": 175620,
+      "text": "I'm gonna go over some of the more fundamental and existential stuff in the regular iPhone 15 review,"
+    },
+    {
+      "index": 47,
+      "startMs": 175620,
+      "endMs": 178110,
+      "text": "so definitely make sure you're subscribed to see that when it comes out."
+    },
+    {
+      "index": 48,
+      "startMs": 178110,
+      "endMs": 180330,
+      "text": "But for the Pro, it's time to deep dive on the stuff"
+    },
+    {
+      "index": 49,
+      "startMs": 180330,
+      "endMs": 183758,
+      "text": "that's unique to this one, the professional stuff."
+    },
+    {
+      "index": 50,
+      "startMs": 183758,
+      "endMs": 190170,
+      "text": "That being the build, the chip, the cameras and the Action Button."
+    },
+    {
+      "index": 51,
+      "startMs": 190170,
+      "endMs": 193080,
+      "text": "So easiest place to start is the way they've built this phone."
+    },
+    {
+      "index": 52,
+      "startMs": 193080,
+      "endMs": 197130,
+      "text": "So Apple made an update to the build and the materials of the iPhone this year,"
+    },
+    {
+      "index": 53,
+      "startMs": 197130,
+      "endMs": 201120,
+      "text": "they've softened the corners a little bit, it's clearly still a boxy design, but, you know,"
+    },
+    {
+      "index": 54,
+      "startMs": 201120,
+      "endMs": 206490,
+      "text": "now, instead of a completely flat glass at the front, there's this gentle little curve just at the very edges."
+    },
+    {
+      "index": 55,
+      "startMs": 206490,
+      "endMs": 210870,
+      "text": "I think that'll maybe make screen protectors slightly more intricate, but I think it has a nice look to it."
+    },
+    {
+      "index": 56,
+      "startMs": 210870,
+      "endMs": 215550,
+      "text": "And then the screen sizes are exactly the same, but now the bezels are actually a tiny bit slimmer"
+    },
+    {
+      "index": 57,
+      "startMs": 215550,
+      "endMs": 216383,
+      "text": "all the way around."
+    },
+    {
+      "index": 58,
+      "startMs": 216383,
+      "endMs": 222570,
+      "text": "So technically the phone is like one millimeter smaller diagonally and the rails have famously switched from"
+    },
+    {
+      "index": 59,
+      "startMs": 222570,
+      "endMs": 227670,
+      "text": "that shiny stainless steel to a lighter, coated and brushed titanium."
+    },
+    {
+      "index": 60,
+      "startMs": 227670,
+      "endMs": 231210,
+      "text": "The result, it's very slightly better, I think."
+    },
+    {
+      "index": 61,
+      "startMs": 231210,
+      "endMs": 238230,
+      "text": "It's kind of funny, I've always associated a heavy phone with like expensive feeling, you know?"
+    },
+    {
+      "index": 62,
+      "startMs": 238230,
+      "endMs": 241551,
+      "text": "Like, the ceramic phones are like extra heavy, they feel like substance."
+    },
+    {
+      "index": 63,
+      "startMs": 241551,
+      "endMs": 244140,
+      "text": "But I understand why people want it to be lighter."
+    },
+    {
+      "index": 64,
+      "startMs": 244140,
+      "endMs": 247080,
+      "text": "And so, this phone is actually noticeably lighter than the previous Pro."
+    },
+    {
+      "index": 65,
+      "startMs": 247080,
+      "endMs": 250472,
+      "text": "It's 10% on paper, but it feels like more than 10%."
+    },
+    {
+      "index": 66,
+      "startMs": 250472,
+      "endMs": 252870,
+      "text": "And then, there's a new set of colors too so I'm sticking with it,"
+    },
+    {
+      "index": 67,
+      "startMs": 252870,
+      "endMs": 257700,
+      "text": "this new natural titanium is the best color, this is the first year I am not ordering"
+    },
+    {
+      "index": 68,
+      "startMs": 257700,
+      "endMs": 259380,
+      "text": "a dark or black iPhone."
+    },
+    {
+      "index": 69,
+      "startMs": 259380,
+      "endMs": 264660,
+      "text": "They still look good, don't get me wrong, but they get all kinds of fingerprints on them like crazy."
+    },
+    {
+      "index": 70,
+      "startMs": 264660,
+      "endMs": 270000,
+      "text": "And also, my worries about the light colored scratches, if you go deep enough,"
+    },
+    {
+      "index": 71,
+      "startMs": 270000,
+      "endMs": 273900,
+      "text": "were all confirmed by Zack, JerryRigEverything, in his video cutting the thing up."
+    },
+    {
+      "index": 72,
+      "startMs": 273900,
+      "endMs": 277590,
+      "text": "So because I'm on team no case, I'm going with the all gray phone,"
+    },
+    {
+      "index": 73,
+      "startMs": 277590,
+      "endMs": 279540,
+      "text": "I think it looks dope, so I'm going with that."
+    },
+    {
+      "index": 74,
+      "startMs": 279540,
+      "endMs": 282360,
+      "text": "I think basically the idea is, if you have a perfectly working phone,"
+    },
+    {
+      "index": 75,
+      "startMs": 282360,
+      "endMs": 285480,
+      "text": "there's no world where you should upgrade to this one just for the titanium build"
+    },
+    {
+      "index": 76,
+      "startMs": 285480,
+      "endMs": 287460,
+      "text": "or just for the slightly thinner bezels."
+    },
+    {
+      "index": 77,
+      "startMs": 287460,
+      "endMs": 291570,
+      "text": "But you have to appreciate, put this up next to an iPhone 11, then, yeah,"
+    },
+    {
+      "index": 78,
+      "startMs": 291570,
+      "endMs": 293907,
+      "text": "you can see the differences compounding over time."
+    },
+    {
+      "index": 79,
+      "startMs": 293907,
+      "endMs": 297870,
+      "text": "Just like if you sat in a 992 generation 911 right now"
+    },
+    {
+      "index": 80,
+      "startMs": 297870,
+      "endMs": 300360,
+      "text": "after sitting in a 997 generation car."
+    },
+    {
+      "index": 81,
+      "startMs": 300360,
+      "endMs": 302846,
+      "text": "But the real highlight of this build here, let's be honest,"
+    },
+    {
+      "index": 82,
+      "startMs": 302846,
+      "endMs": 307846,
+      "text": "is there's a new port at the bottom, that USB type C,"
+    },
+    {
+      "index": 83,
+      "startMs": 307989,
+      "endMs": 311790,
+      "text": "which makes a big difference to people like me who have other gadgets in their life,"
+    },
+    {
+      "index": 84,
+      "startMs": 311790,
+      "endMs": 317220,
+      "text": "computers, headphones, mouse, keyboard, I just bring one charger, it works with everything."
+    },
+    {
+      "index": 85,
+      "startMs": 317220,
+      "endMs": 321060,
+      "text": "I have already had this rite of passage moment that everyone"
+    },
+    {
+      "index": 86,
+      "startMs": 321060,
+      "endMs": 323760,
+      "text": "who gets this phone is gonna have where you have an existing Lightning cable"
+    },
+    {
+      "index": 87,
+      "startMs": 323760,
+      "endMs": 325350,
+      "text": "and you try to plug it in and then you're like,"
+    },
+    {
+      "index": 88,
+      "startMs": 325350,
+      "endMs": 327082,
+      "text": "oh right, new cable."
+    },
+    {
+      "index": 89,
+      "startMs": 327082,
+      "endMs": 328860,
+      "text": "But now I've gotten used to it."
+    },
+    {
+      "index": 90,
+      "startMs": 328860,
+      "endMs": 333780,
+      "text": "But the thing is, I could have sworn Apple would do more with this port."
+    },
+    {
+      "index": 91,
+      "startMs": 333780,
+      "endMs": 337620,
+      "text": "Like, okay, we know that they were basically forced into doing this by the EU,"
+    },
+    {
+      "index": 92,
+      "startMs": 337620,
+      "endMs": 339720,
+      "text": "so shout out to the EU for that."
+    },
+    {
+      "index": 93,
+      "startMs": 339720,
+      "endMs": 342600,
+      "text": "Now we have a USB iPhone, but like the only pitch is just,"
+    },
+    {
+      "index": 94,
+      "startMs": 342600,
+      "endMs": 344392,
+      "text": "hey, one cable for everything."
+    },
+    {
+      "index": 95,
+      "startMs": 344392,
+      "endMs": 346020,
+      "text": "That's it, Apple really?"
+    },
+    {
+      "index": 96,
+      "startMs": 346020,
+      "endMs": 348720,
+      "text": "So like with 30 pin to Lightning all those years ago,"
+    },
+    {
+      "index": 97,
+      "startMs": 348720,
+      "endMs": 352200,
+      "text": "the benefit was obvious, it's just so much smaller of a port"
+    },
+    {
+      "index": 98,
+      "startMs": 352200,
+      "endMs": 355500,
+      "text": "so that let them fit more stuff in the phone, plus it's reversible now."
+    },
+    {
+      "index": 99,
+      "startMs": 355500,
+      "endMs": 360270,
+      "text": "Now with this USB type C, it's like okay, it was already small, it was already reversible,"
+    },
+    {
+      "index": 100,
+      "startMs": 360270,
+      "endMs": 363570,
+      "text": "charging speed did not improve at all, it's still 25 watts."
+    },
+    {
+      "index": 101,
+      "startMs": 363570,
+      "endMs": 367320,
+      "text": "There's no extra like desktop mode, plug it into a monitor and get,"
+    },
+    {
+      "index": 102,
+      "startMs": 367320,
+      "endMs": 369060,
+      "text": "there's no decks or anything like that, right?"
+    },
+    {
+      "index": 103,
+      "startMs": 369060,
+      "endMs": 371493,
+      "text": "It's just one cable for everything."
+    },
+    {
+      "index": 104,
+      "startMs": 372500,
+      "endMs": 375270,
+      "text": "Okay, fine, sure, welcome to the club."
+    },
+    {
+      "index": 105,
+      "startMs": 375270,
+      "endMs": 379526,
+      "text": "You know, iPhone users can now take advantage of the U in USB-C."
+    },
+    {
+      "index": 106,
+      "startMs": 379526,
+      "endMs": 383850,
+      "text": "I talked about the handshake it does with plugging directly into other phones"
+    },
+    {
+      "index": 107,
+      "startMs": 383850,
+      "endMs": 388440,
+      "text": "and reverse charging them at four and a half watts in the unboxing video, that's pretty neat."
+    },
+    {
+      "index": 108,
+      "startMs": 388440,
+      "endMs": 393000,
+      "text": "You can also plug in other things, plug in a keyboard and type with it, plug in a monitor,"
+    },
+    {
+      "index": 109,
+      "startMs": 393000,
+      "endMs": 395370,
+      "text": "it'll mirror your screen at up to 4K 60."
+    },
+    {
+      "index": 110,
+      "startMs": 395370,
+      "endMs": 399180,
+      "text": "And the Pro phone now supports USB 3.0 data transfer speeds"
+    },
+    {
+      "index": 111,
+      "startMs": 399180,
+      "endMs": 403350,
+      "text": "so you can get that ProRes footage off the phone noticeably faster,"
+    },
+    {
+      "index": 112,
+      "startMs": 403350,
+      "endMs": 407820,
+      "text": "and you can actually, for the first time, shoot video directly onto an external drive."
+    },
+    {
+      "index": 113,
+      "startMs": 407820,
+      "endMs": 410370,
+      "text": "Now there's some talk about the cable that comes in the box."
+    },
+    {
+      "index": 114,
+      "startMs": 410370,
+      "endMs": 414840,
+      "text": "Remember that nice high quality braided USB-C cable that comes in the box?"
+    },
+    {
+      "index": 115,
+      "startMs": 414840,
+      "endMs": 418650,
+      "text": "But it's only USB 2.0 transfer speeds, it's a slow cable."
+    },
+    {
+      "index": 116,
+      "startMs": 418650,
+      "endMs": 421830,
+      "text": "So if you have a Pro phone, you need get a faster separate cable for it?"
+    },
+    {
+      "index": 117,
+      "startMs": 421830,
+      "endMs": 424974,
+      "text": "That seemed weird to people, but it's not, that's very normal."
+    },
+    {
+      "index": 118,
+      "startMs": 424974,
+      "endMs": 429058,
+      "text": "Most smartphones come with just a USB-C cable just to charge."
+    },
+    {
+      "index": 119,
+      "startMs": 429058,
+      "endMs": 430410,
+      "text": "It's a charging cable."
+    },
+    {
+      "index": 120,
+      "startMs": 430410,
+      "endMs": 434100,
+      "text": "If you wanted a data cable, you'd have to buy a thicker, more robust cable"
+    },
+    {
+      "index": 121,
+      "startMs": 434100,
+      "endMs": 437284,
+      "text": "that looks the same but is a data cable."
+    },
+    {
+      "index": 122,
+      "startMs": 437284,
+      "endMs": 440820,
+      "text": "It's kind of confusing and annoying actually."
+    },
+    {
+      "index": 123,
+      "startMs": 440820,
+      "endMs": 444960,
+      "text": "Welcome to the world of USB-C, my friends, it's good to have you."
+    },
+    {
+      "index": 124,
+      "startMs": 444960,
+      "endMs": 451050,
+      "text": "But that is a good segue to the main enabler, the new powerhouse chip inside this phone with a new name,"
+    },
+    {
+      "index": 125,
+      "startMs": 451050,
+      "endMs": 457620,
+      "text": "the A17 Pro. So the base iPhone 15s got last year's A16 bionic from the 14 Pro."
+    },
+    {
+      "index": 126,
+      "startMs": 457620,
+      "endMs": 463050,
+      "text": "And so, here's this new more powerful chip in the highest end phones and it's not the A17 Bionic,"
+    },
+    {
+      "index": 127,
+      "startMs": 463050,
+      "endMs": 465750,
+      "text": "this is the first one with the Pro name, A17 Pro,"
+    },
+    {
+      "index": 128,
+      "startMs": 465750,
+      "endMs": 468000,
+      "text": "and this thing goes kind of crazy on paper."
+    },
+    {
+      "index": 129,
+      "startMs": 468000,
+      "endMs": 472050,
+      "text": "This is their first three nanometer chip, actually, the first three nanometer chip in any phone"
+    },
+    {
+      "index": 130,
+      "startMs": 472050,
+      "endMs": 475350,
+      "text": "that we'll probably see for at least another year or two."
+    },
+    {
+      "index": 131,
+      "startMs": 475350,
+      "endMs": 482370,
+      "text": "I ran some benchmarks, it's literally approaching M1 chip levels of synthetic benchmark scores, and compared to last year,"
+    },
+    {
+      "index": 132,
+      "startMs": 482370,
+      "endMs": 488310,
+      "text": "it's 10 to 20% more powerful on both the CPU and the GPU, which is very respectable."
+    },
+    {
+      "index": 133,
+      "startMs": 488310,
+      "endMs": 492390,
+      "text": "But more power is like more horsepower in a car."
+    },
+    {
+      "index": 134,
+      "startMs": 492390,
+      "endMs": 498030,
+      "text": "It's only really useful or noticeable if it lets you do more things with it."
+    },
+    {
+      "index": 135,
+      "startMs": 498030,
+      "endMs": 500100,
+      "text": "I'm gonna live in this analogy a bit more for a minute,"
+    },
+    {
+      "index": 136,
+      "startMs": 500100,
+      "endMs": 506250,
+      "text": "but like the last generation Porsche 911 Turbo S, it was already so ballistic fast"
+    },
+    {
+      "index": 137,
+      "startMs": 506250,
+      "endMs": 511740,
+      "text": "that you never approached that limit anywhere on public streets until you get to the highest end of performance,"
+    },
+    {
+      "index": 138,
+      "startMs": 511740,
+      "endMs": 514320,
+      "text": "on the track. And the highest end iPhone is the same way,"
+    },
+    {
+      "index": 139,
+      "startMs": 514320,
+      "endMs": 519540,
+      "text": "like, the Pro iPhone's been great at just surfing Instagram and texting"
+    },
+    {
+      "index": 140,
+      "startMs": 519540,
+      "endMs": 523440,
+      "text": "and doing all the normal web browsing, basic stuff you'd do on a phone."
+    },
+    {
+      "index": 141,
+      "startMs": 523440,
+      "endMs": 529680,
+      "text": "And so, the only place you'd really notice the extra performance is, well, we got a gaming demo."
+    },
+    {
+      "index": 142,
+      "startMs": 529680,
+      "endMs": 534000,
+      "text": "Apple showed these wild demos on the new iPhone at the keynote."
+    },
+    {
+      "index": 143,
+      "startMs": 534000,
+      "endMs": 536940,
+      "text": "And just a disclaimer, I'm not much of a phone gamer"
+    },
+    {
+      "index": 144,
+      "startMs": 536940,
+      "endMs": 541500,
+      "text": "so I'll defer the commentary on this to Dave2D, you can go watch his video, linked below."
+    },
+    {
+      "index": 145,
+      "startMs": 541500,
+      "endMs": 548040,
+      "text": "But they literally launched exclusive games on the iPhone, that are like \"Resident Evil: Village\""
+    },
+    {
+      "index": 146,
+      "startMs": 548040,
+      "endMs": 554640,
+      "text": "and \"Assassin's Creed\", but not on cut down mobile versions, these are literally the same versions with the same assets"
+    },
+    {
+      "index": 147,
+      "startMs": 554640,
+      "endMs": 560910,
+      "text": "and same textures and everything from the PlayStation version 'cause it literally is the PlayStation version."
+    },
+    {
+      "index": 148,
+      "startMs": 560910,
+      "endMs": 564054,
+      "text": "That's impressive. Plus you know, performance headroom is never a bad thing."
+    },
+    {
+      "index": 149,
+      "startMs": 564054,
+      "endMs": 566520,
+      "text": "But I think also for me and for a lot of other people,"
+    },
+    {
+      "index": 150,
+      "startMs": 566520,
+      "endMs": 570270,
+      "text": "the more impactful things that you'll actually notice about this new chip"
+    },
+    {
+      "index": 151,
+      "startMs": 570270,
+      "endMs": 573960,
+      "text": "are in the dedicated parts of it that are for specific tasks."
+    },
+    {
+      "index": 152,
+      "startMs": 573960,
+      "endMs": 578070,
+      "text": "Like, the new image signal processor lets you take really, really fast,"
+    },
+    {
+      "index": 153,
+      "startMs": 578070,
+      "endMs": 583500,
+      "text": "lag-free photos constantly. The new neural engine recognizes Portrait Mode subjects,"
+    },
+    {
+      "index": 154,
+      "startMs": 583500,
+      "endMs": 589110,
+      "text": "like people's faces and dogs and cats automatically, and lets you go back in time"
+    },
+    {
+      "index": 155,
+      "startMs": 589110,
+      "endMs": 591566,
+      "text": "and set a regular photo to a Portrait Mode photo."
+    },
+    {
+      "index": 156,
+      "startMs": 591566,
+      "endMs": 596880,
+      "text": "The USB 3 controller that enables faster data transfer speeds is also on the A17 Pro,"
+    },
+    {
+      "index": 157,
+      "startMs": 596880,
+      "endMs": 598830,
+      "text": "all of that is coming from the new chip."
+    },
+    {
+      "index": 158,
+      "startMs": 598830,
+      "endMs": 603150,
+      "text": "But what I'm more concerned with at the moment is battery life."
+    },
+    {
+      "index": 159,
+      "startMs": 603150,
+      "endMs": 608100,
+      "text": "Okay, so actually, it's kind of two main issues that have been popping up"
+    },
+    {
+      "index": 160,
+      "startMs": 608100,
+      "endMs": 611370,
+      "text": "that you kind of have to try to figure out, are they isolated issues"
+    },
+    {
+      "index": 161,
+      "startMs": 611370,
+      "endMs": 613140,
+      "text": "or are these real problems with the phone?"
+    },
+    {
+      "index": 162,
+      "startMs": 613140,
+      "endMs": 616530,
+      "text": "And those are battery life and overheating issues."
+    },
+    {
+      "index": 163,
+      "startMs": 616530,
+      "endMs": 619590,
+      "text": "And to be honest, part of the reason this review took like longer than normal"
+    },
+    {
+      "index": 164,
+      "startMs": 619590,
+      "endMs": 623610,
+      "text": "is I've been really trying to dig into the battery and figure out what's going on here."
+    },
+    {
+      "index": 165,
+      "startMs": 623610,
+      "endMs": 628140,
+      "text": "So objectively speaking, these phones have slightly bigger batteries than last year"
+    },
+    {
+      "index": 166,
+      "startMs": 628140,
+      "endMs": 629820,
+      "text": "and a new three nanometer chip."
+    },
+    {
+      "index": 167,
+      "startMs": 629820,
+      "endMs": 633240,
+      "text": "So in a controlled environment, they should do better and they do,"
+    },
+    {
+      "index": 168,
+      "startMs": 633240,
+      "endMs": 636510,
+      "text": "they literally last longer on like simple benchmark stuff."
+    },
+    {
+      "index": 169,
+      "startMs": 636510,
+      "endMs": 638250,
+      "text": "So that's good news."
+    },
+    {
+      "index": 170,
+      "startMs": 638250,
+      "endMs": 642540,
+      "text": "Now when I test a phone, like normal, I pretty much, I kind of go by feel,"
+    },
+    {
+      "index": 171,
+      "startMs": 642540,
+      "endMs": 647910,
+      "text": "I always have some mix of good days, some average days and then some bad days,"
+    },
+    {
+      "index": 172,
+      "startMs": 647910,
+      "endMs": 651060,
+      "text": "where I can sort of figure out what's draining it, what its weaknesses are"
+    },
+    {
+      "index": 173,
+      "startMs": 651060,
+      "endMs": 652910,
+      "text": "and then I can come to a conclusion from that."
+    },
+    {
+      "index": 174,
+      "startMs": 652910,
+      "endMs": 654750,
+      "text": "So now here we are, I get a couple days in,"
+    },
+    {
+      "index": 175,
+      "startMs": 654750,
+      "endMs": 658920,
+      "text": "I get a couple weeks in and I've had a good amount of average days,"
+    },
+    {
+      "index": 176,
+      "startMs": 658920,
+      "endMs": 665280,
+      "text": "I've had a couple of those bad draining days, but I also haven't had any of those amazing days"
+    },
+    {
+      "index": 177,
+      "startMs": 665280,
+      "endMs": 667590,
+      "text": "where I get like nine hours of screen on time."
+    },
+    {
+      "index": 178,
+      "startMs": 667590,
+      "endMs": 669120,
+      "text": "I just haven't had any yet."
+    },
+    {
+      "index": 179,
+      "startMs": 669120,
+      "endMs": 670950,
+      "text": "And then, we also started to see some of those headlines"
+    },
+    {
+      "index": 180,
+      "startMs": 670950,
+      "endMs": 675270,
+      "text": "about battery life potentially being worse and there's also some overheating issues"
+    },
+    {
+      "index": 181,
+      "startMs": 675270,
+      "endMs": 680010,
+      "text": "popping up on Twitter or X and some people were asking if mine has had any issues."
+    },
+    {
+      "index": 182,
+      "startMs": 680010,
+      "endMs": 684480,
+      "text": "So here's the weird answer, yes, but not when I would expect,"
+    },
+    {
+      "index": 183,
+      "startMs": 684480,
+      "endMs": 686820,
+      "text": "Two days ago, literally, I was just at a golf tournament,"
+    },
+    {
+      "index": 184,
+      "startMs": 686820,
+      "endMs": 689310,
+      "text": "it was in Florida, it was like 100 degree really feel"
+    },
+    {
+      "index": 185,
+      "startMs": 689310,
+      "endMs": 690240,
+      "text": "or something crazy like that."
+    },
+    {
+      "index": 186,
+      "startMs": 690240,
+      "endMs": 695670,
+      "text": "And I'm outside with my phone at max brightness with GPS going all day out in the sun,"
+    },
+    {
+      "index": 187,
+      "startMs": 695670,
+      "endMs": 697950,
+      "text": "and it was fine, no problem, no overheating issues."
+    },
+    {
+      "index": 188,
+      "startMs": 697950,
+      "endMs": 701850,
+      "text": "But then, a couple hours later, I'm on the airplane with my phone in Airplane Mode"
+    },
+    {
+      "index": 189,
+      "startMs": 701850,
+      "endMs": 706560,
+      "text": "and I've got just like music playing on Bluetooth with Spotify and like scrolling through Instagram,"
+    },
+    {
+      "index": 190,
+      "startMs": 706560,
+      "endMs": 709800,
+      "text": "and for like five minutes, the phone just gets really hot"
+    },
+    {
+      "index": 191,
+      "startMs": 709800,
+      "endMs": 712950,
+      "text": "and just blasts through like 5% battery, and then it's fine again afterwards,"
+    },
+    {
+      "index": 192,
+      "startMs": 712950,
+      "endMs": 716130,
+      "text": "and I'm like, there almost seems to be no rhyme or reason"
+    },
+    {
+      "index": 193,
+      "startMs": 716130,
+      "endMs": 718080,
+      "text": "why it does this randomly once in a while."
+    },
+    {
+      "index": 194,
+      "startMs": 718080,
+      "endMs": 721680,
+      "text": "So my best theory is that the A17 Pro is just,"
+    },
+    {
+      "index": 195,
+      "startMs": 721680,
+      "endMs": 725880,
+      "text": "it's a more powerful chip and so therefore, is able to drain power more quickly than before"
+    },
+    {
+      "index": 196,
+      "startMs": 725880,
+      "endMs": 728553,
+      "text": "in high intensity settings, like gaming, et cetera."
+    },
+    {
+      "index": 197,
+      "startMs": 728553,
+      "endMs": 732030,
+      "text": "And there's also been some issues attributed to iOS 17 bugs,"
+    },
+    {
+      "index": 198,
+      "startMs": 732030,
+      "endMs": 734400,
+      "text": "like we're already on 17.0.2."
+    },
+    {
+      "index": 199,
+      "startMs": 734400,
+      "endMs": 739200,
+      "text": "I imagine there's some more updates coming to both iOS and a bunch of apps."
+    },
+    {
+      "index": 200,
+      "startMs": 739200,
+      "endMs": 741840,
+      "text": "But by the end of this, I kind of feel like I'm expecting battery life"
+    },
+    {
+      "index": 201,
+      "startMs": 741840,
+      "endMs": 744450,
+      "text": "to basically even out to be the same as last year,"
+    },
+    {
+      "index": 202,
+      "startMs": 744450,
+      "endMs": 746820,
+      "text": "which is a boring answer, but that's kind of what I expect."
+    },
+    {
+      "index": 203,
+      "startMs": 746820,
+      "endMs": 752460,
+      "text": "Now we can talk all we want about what the word Pro actually means in a smartphone,"
+    },
+    {
+      "index": 204,
+      "startMs": 752460,
+      "endMs": 756150,
+      "text": "but with iPhones, that has mostly meant cameras."
+    },
+    {
+      "index": 205,
+      "startMs": 756150,
+      "endMs": 762510,
+      "text": "And it turns out there is a lot going on with these relatively similar looking cameras"
+    },
+    {
+      "index": 206,
+      "startMs": 762510,
+      "endMs": 764730,
+      "text": "on these new Pro phones, both in hardware and software."
+    },
+    {
+      "index": 207,
+      "startMs": 764730,
+      "endMs": 767820,
+      "text": "So you're looking at a new bigger 48 megapixel main camera."
+    },
+    {
+      "index": 208,
+      "startMs": 767820,
+      "endMs": 771630,
+      "text": "There's also an improved ultra wide with a closer up macro capability"
+    },
+    {
+      "index": 209,
+      "startMs": 771630,
+      "endMs": 775530,
+      "text": "and a whole telephoto situation that we'll get to in a minute."
+    },
+    {
+      "index": 210,
+      "startMs": 775530,
+      "endMs": 782670,
+      "text": "But then with software, there is this whole new intricate image processing pipeline happening."
+    },
+    {
+      "index": 211,
+      "startMs": 782670,
+      "endMs": 787320,
+      "text": "So you know how most smartphones, a lot of 'em today have like 48 megapixel cameras"
+    },
+    {
+      "index": 212,
+      "startMs": 787320,
+      "endMs": 789840,
+      "text": "and they all bin down to 12 megapixels."
+    },
+    {
+      "index": 213,
+      "startMs": 789840,
+      "endMs": 791190,
+      "text": "They give you 12 megapixel shots."
+    },
+    {
+      "index": 214,
+      "startMs": 791190,
+      "endMs": 795780,
+      "text": "You know, previous iPhones did this, this new one, for those who might've missed it,"
+    },
+    {
+      "index": 215,
+      "startMs": 795780,
+      "endMs": 801975,
+      "text": "is actually by default spitting out 24 megapixel images instead of 12,"
+    },
+    {
+      "index": 216,
+      "startMs": 801975,
+      "endMs": 804060,
+      "text": "and it's only about one and a half times of file size."
+    },
+    {
+      "index": 217,
+      "startMs": 804060,
+      "endMs": 806640,
+      "text": "So this new process, which is the same actually across the board"
+    },
+    {
+      "index": 218,
+      "startMs": 806640,
+      "endMs": 813090,
+      "text": "for iPhone 15s and 15 Pros, is it's taking a 48 megapixel full sensor shot"
+    },
+    {
+      "index": 219,
+      "startMs": 813090,
+      "endMs": 819420,
+      "text": "for detail information and also taking a full sensor 12 megapixel shot,"
+    },
+    {
+      "index": 220,
+      "startMs": 819420,
+      "endMs": 823470,
+      "text": "which is the quad binning for light information and noise."
+    },
+    {
+      "index": 221,
+      "startMs": 823470,
+      "endMs": 829320,
+      "text": "And then, it's using the neural net to combine them and do a sort of a detailed transfer"
+    },
+    {
+      "index": 222,
+      "startMs": 829320,
+      "endMs": 833010,
+      "text": "to get you this hybrid 24 megapixel image."
+    },
+    {
+      "index": 223,
+      "startMs": 833010,
+      "endMs": 841207,
+      "text": "It's very complicated, very clever, and the end result is slightly better."
+    },
+    {
+      "index": 224,
+      "startMs": 841680,
+      "endMs": 843750,
+      "text": "It's really right in line with what I've been saying."
+    },
+    {
+      "index": 225,
+      "startMs": 843750,
+      "endMs": 847871,
+      "text": "So if you just generally look at photos shot on this camera,"
+    },
+    {
+      "index": 226,
+      "startMs": 847871,
+      "endMs": 852660,
+      "text": "it's an iPhone photo, like, they look pretty great, they're awesome with dynamic range"
+    },
+    {
+      "index": 227,
+      "startMs": 852660,
+      "endMs": 854160,
+      "text": "and sharpness across the board."
+    },
+    {
+      "index": 228,
+      "startMs": 854160,
+      "endMs": 857676,
+      "text": "I still prefer and shoot in the rich contrast profile most of the time,"
+    },
+    {
+      "index": 229,
+      "startMs": 857676,
+      "endMs": 860460,
+      "text": "but, yeah, mostly, the iPhone is one of the best cameras"
+    },
+    {
+      "index": 230,
+      "startMs": 860460,
+      "endMs": 864300,
+      "text": "at just pointing and shooting, in full auto, just getting results that look good,"
+    },
+    {
+      "index": 231,
+      "startMs": 864300,
+      "endMs": 868200,
+      "text": "even if it doesn't look the most like real life, you know,"
+    },
+    {
+      "index": 232,
+      "startMs": 868200,
+      "endMs": 874680,
+      "text": "it's doing the classic relighting and tone mapping and everything we're used to from all this smart HDR,"
+    },
+    {
+      "index": 233,
+      "startMs": 874680,
+      "endMs": 878370,
+      "text": "it's all here and a lot of people like it and it looks good."
+    },
+    {
+      "index": 234,
+      "startMs": 878370,
+      "endMs": 880530,
+      "text": "The improved Macro Mode is also really good."
+    },
+    {
+      "index": 235,
+      "startMs": 880530,
+      "endMs": 884580,
+      "text": "And with this natural fall off with the primary camera without even needing Portrait Mode,"
+    },
+    {
+      "index": 236,
+      "startMs": 884580,
+      "endMs": 887442,
+      "text": "you can get some blurred backgrounds, it's awesome."
+    },
+    {
+      "index": 237,
+      "startMs": 887442,
+      "endMs": 891420,
+      "text": "Autofocus is also really, really fast, especially whenever there's a face in the scene,"
+    },
+    {
+      "index": 238,
+      "startMs": 891420,
+      "endMs": 892862,
+      "text": "this thing loves seeing faces."
+    },
+    {
+      "index": 239,
+      "startMs": 892862,
+      "endMs": 896940,
+      "text": "And the benefit of the bigger sensor shows itself at night too"
+    },
+    {
+      "index": 240,
+      "startMs": 896940,
+      "endMs": 899580,
+      "text": "with even longer handheld captures."
+    },
+    {
+      "index": 241,
+      "startMs": 899580,
+      "endMs": 905490,
+      "text": "It's not magic, it's just physics, but, you know, does the 24 megapixel make a difference"
+    },
+    {
+      "index": 242,
+      "startMs": 905490,
+      "endMs": 907590,
+      "text": "over the 12 megapixel?"
+    },
+    {
+      "index": 243,
+      "startMs": 907590,
+      "endMs": 911220,
+      "text": "Well, zoomed out, absolutely not, they look basically the same."
+    },
+    {
+      "index": 244,
+      "startMs": 911220,
+      "endMs": 915690,
+      "text": "So you gotta zoom in, and even at 50% zoom, you still can't really tell."
+    },
+    {
+      "index": 245,
+      "startMs": 915690,
+      "endMs": 918990,
+      "text": "It's not until you zoom all the way in that you can,"
+    },
+    {
+      "index": 246,
+      "startMs": 918990,
+      "endMs": 922020,
+      "text": "okay, you can see a difference, you can start to notice a difference"
+    },
+    {
+      "index": 247,
+      "startMs": 922020,
+      "endMs": 923670,
+      "text": "in fine detail and contrast."
+    },
+    {
+      "index": 248,
+      "startMs": 923670,
+      "endMs": 928410,
+      "text": "The 15 Pro is definitely, when your pixel peeping, more contrasty and sharp"
+    },
+    {
+      "index": 249,
+      "startMs": 928410,
+      "endMs": 931230,
+      "text": "when you're all the way zoomed in versus last year."
+    },
+    {
+      "index": 250,
+      "startMs": 931230,
+      "endMs": 933854,
+      "text": "But that's just when you've zoomed all the way in."
+    },
+    {
+      "index": 251,
+      "startMs": 933854,
+      "endMs": 939480,
+      "text": "And by the way, once you get past 2X zoom, it's back to kicking out regular 12 megapixel images."
+    },
+    {
+      "index": 252,
+      "startMs": 939480,
+      "endMs": 947280,
+      "text": "So again, it's like, it's a small, small year-over-year improvement with that tiny amount of like pixel peeping detail,"
+    },
+    {
+      "index": 253,
+      "startMs": 947280,
+      "endMs": 952860,
+      "text": "but over a longer distance, over a bunch of generations, that's the type of thing that adds up."
+    },
+    {
+      "index": 254,
+      "startMs": 952860,
+      "endMs": 956760,
+      "text": "They even, on the Pro phones, did a couple of presets from the 1X lens."
+    },
+    {
+      "index": 255,
+      "startMs": 956760,
+      "endMs": 961860,
+      "text": "There's a 24 millimeter all the way zoomed out, then a 28 millimeter, a little bit tighter,"
+    },
+    {
+      "index": 256,
+      "startMs": 961860,
+      "endMs": 968010,
+      "text": "and a 35 millimeter that all have their own dedicated image processing pipeline presets"
+    },
+    {
+      "index": 257,
+      "startMs": 968010,
+      "endMs": 972510,
+      "text": "to maximize detail into these basically super res, zoom, focal lengths"
+    },
+    {
+      "index": 258,
+      "startMs": 972510,
+      "endMs": 974520,
+      "text": "that you can digitally zoom between."
+    },
+    {
+      "index": 259,
+      "startMs": 974520,
+      "endMs": 977760,
+      "text": "I wouldn't exactly call it having extra lenses on the phone,"
+    },
+    {
+      "index": 260,
+      "startMs": 977760,
+      "endMs": 985350,
+      "text": "but, you know, 1.5X zoom on last year's phone versus 1.5X zoom on this year's phone, slight difference."
+    },
+    {
+      "index": 261,
+      "startMs": 985350,
+      "endMs": 986970,
+      "text": "But there is a difference."
+    },
+    {
+      "index": 262,
+      "startMs": 986970,
+      "endMs": 991740,
+      "text": "Honestly, the most Pro things about these new phones though is definitely their video cameras,"
+    },
+    {
+      "index": 263,
+      "startMs": 991740,
+      "endMs": 994350,
+      "text": "so I'm just gonna nerd out about these for a second."
+    },
+    {
+      "index": 264,
+      "startMs": 994350,
+      "endMs": 998160,
+      "text": "Because the iPhone's video capabilities, I've talked about this so much,"
+    },
+    {
+      "index": 265,
+      "startMs": 998160,
+      "endMs": 1002000,
+      "text": "but they're still so clearly far out in front of the rest of the smartphone world."
+    },
+    {
+      "index": 266,
+      "startMs": 1002000,
+      "endMs": 1006140,
+      "text": "It doesn't even shoot 8K, which it's totally capable of with the 48 megapixels."
+    },
+    {
+      "index": 267,
+      "startMs": 1006140,
+      "endMs": 1012410,
+      "text": "I wish they would let us, but even just at 4K 30 in full auto, the detail,"
+    },
+    {
+      "index": 268,
+      "startMs": 1012410,
+      "endMs": 1018680,
+      "text": "the auto focus, the slight depth, the dynamic range, the stabilization, they're all world class."
+    },
+    {
+      "index": 269,
+      "startMs": 1018680,
+      "endMs": 1023330,
+      "text": "I mean, if you wanna just look at test footage, the entire electric Rivian delivery van review I did"
+    },
+    {
+      "index": 270,
+      "startMs": 1023330,
+      "endMs": 1026300,
+      "text": "on the Auto Focus channel was shot on iPhone 15 Pro,"
+    },
+    {
+      "index": 271,
+      "startMs": 1026300,
+      "endMs": 1029930,
+      "text": "audio included, I'll drop the link below if you wanna watch that whole thing."
+    },
+    {
+      "index": 272,
+      "startMs": 1029930,
+      "endMs": 1032810,
+      "text": "Also, shout out to the new AV1 Codec support on the chip,"
+    },
+    {
+      "index": 273,
+      "startMs": 1032810,
+      "endMs": 1034790,
+      "text": "that's gonna play nice with YouTube."
+    },
+    {
+      "index": 274,
+      "startMs": 1034790,
+      "endMs": 1040820,
+      "text": "But this year, you can also shoot Log, literally a Pro camera feature."
+    },
+    {
+      "index": 275,
+      "startMs": 1040820,
+      "endMs": 1046520,
+      "text": "Now it is annoyingly buried several layers deep in the separate Settings app,"
+    },
+    {
+      "index": 276,
+      "startMs": 1046520,
+      "endMs": 1048800,
+      "text": "which is really not very Pro."
+    },
+    {
+      "index": 277,
+      "startMs": 1048800,
+      "endMs": 1050870,
+      "text": "But if you find the time to go switch over there"
+    },
+    {
+      "index": 278,
+      "startMs": 1050870,
+      "endMs": 1055070,
+      "text": "and get into Log, the iPhone will shoot with way more information,"
+    },
+    {
+      "index": 279,
+      "startMs": 1055070,
+      "endMs": 1058640,
+      "text": "that classic flat Log look, dynamic range, everything."
+    },
+    {
+      "index": 280,
+      "startMs": 1058640,
+      "endMs": 1060980,
+      "text": "And you don't have to deal with whatever Apple was gonna do"
+    },
+    {
+      "index": 281,
+      "startMs": 1060980,
+      "endMs": 1063530,
+      "text": "with over sharpening and saturation and processing."
+    },
+    {
+      "index": 282,
+      "startMs": 1063530,
+      "endMs": 1067370,
+      "text": "Apple has its own transformation LUT to turn it into SDR or HDR"
+    },
+    {
+      "index": 283,
+      "startMs": 1067370,
+      "endMs": 1071660,
+      "text": "or you can go in and fully grade it yourself to really get the most out of the iPhone's video"
+    },
+    {
+      "index": 284,
+      "startMs": 1071660,
+      "endMs": 1075560,
+      "text": "and it looks really, like, really, really good."
+    },
+    {
+      "index": 285,
+      "startMs": 1075560,
+      "endMs": 1078020,
+      "text": "So the one thing that I'm gonna say to, you know,"
+    },
+    {
+      "index": 286,
+      "startMs": 1078020,
+      "endMs": 1083480,
+      "text": "because I'm pixel peeping at this point, is the haloing from point light sources."
+    },
+    {
+      "index": 287,
+      "startMs": 1083480,
+      "endMs": 1085880,
+      "text": "You know, it's one of the hardest challenges with these tiny optics"
+    },
+    {
+      "index": 288,
+      "startMs": 1085880,
+      "endMs": 1089060,
+      "text": "so I get why they haven't just fixed it yet, but like it's pretty bad."
+    },
+    {
+      "index": 289,
+      "startMs": 1089060,
+      "endMs": 1094940,
+      "text": "Anytime there's any sort of point lights, especially with video, despite whatever new lens coding they're doing,"
+    },
+    {
+      "index": 290,
+      "startMs": 1094940,
+      "endMs": 1098240,
+      "text": "it's pretty dramatic and it seems like it's the worst on the iPhone of any other phone."
+    },
+    {
+      "index": 291,
+      "startMs": 1098240,
+      "endMs": 1103358,
+      "text": "So it's there, gonna point it out again, but, hey, if that's the biggest downside of iPhone video,"
+    },
+    {
+      "index": 292,
+      "startMs": 1103358,
+      "endMs": 1104510,
+      "text": "I'll definitely take it."
+    },
+    {
+      "index": 293,
+      "startMs": 1104510,
+      "endMs": 1108290,
+      "text": "And then, iPhone 15 Pro Max, the big one is the only one that comes with"
+    },
+    {
+      "index": 294,
+      "startMs": 1108290,
+      "endMs": 1111389,
+      "text": "the new 5X larger telephoto lens."
+    },
+    {
+      "index": 295,
+      "startMs": 1111389,
+      "endMs": 1116870,
+      "text": "I would bet my life that that's gonna come down to the smaller 16 Pro next year, whatever,"
+    },
+    {
+      "index": 296,
+      "startMs": 1116870,
+      "endMs": 1118070,
+      "text": "but it's only in the big one this time."
+    },
+    {
+      "index": 297,
+      "startMs": 1118070,
+      "endMs": 1123590,
+      "text": "But yeah, it does let you get a little further with max zoom, from 15X to 25X."
+    },
+    {
+      "index": 298,
+      "startMs": 1123590,
+      "endMs": 1127190,
+      "text": "It's nice if you do a lot of zoomed photos and videos,"
+    },
+    {
+      "index": 299,
+      "startMs": 1127190,
+      "endMs": 1129590,
+      "text": "which is a very specific crowd, there's some people that do that,"
+    },
+    {
+      "index": 300,
+      "startMs": 1129590,
+      "endMs": 1131870,
+      "text": "you know, concert goers, things like that."
+    },
+    {
+      "index": 301,
+      "startMs": 1131870,
+      "endMs": 1134390,
+      "text": "But there are just very few people who should buy one"
+    },
+    {
+      "index": 302,
+      "startMs": 1134390,
+      "endMs": 1138080,
+      "text": "just for this lens because it also means you have to have a bigger phone"
+    },
+    {
+      "index": 303,
+      "startMs": 1138080,
+      "endMs": 1142730,
+      "text": "and it also happens to mean that your 4X photos just before you get to 5X"
+    },
+    {
+      "index": 304,
+      "startMs": 1142730,
+      "endMs": 1144170,
+      "text": "will actually be worse on this phone."
+    },
+    {
+      "index": 305,
+      "startMs": 1144170,
+      "endMs": 1147740,
+      "text": "But, yeah, it's not nearly as capable as some of the longer telephoto periscope lens."
+    },
+    {
+      "index": 306,
+      "startMs": 1147740,
+      "endMs": 1153380,
+      "text": "I mean Samsung has a 10X optical lens that blows this one out the water in terms of reach,"
+    },
+    {
+      "index": 307,
+      "startMs": 1153380,
+      "endMs": 1156770,
+      "text": "I think Apple's main advantage really is just stabilization."
+    },
+    {
+      "index": 308,
+      "startMs": 1156770,
+      "endMs": 1160760,
+      "text": "Like, they finally do that zoom in preview window on the corner of the viewfinder"
+    },
+    {
+      "index": 309,
+      "startMs": 1160760,
+      "endMs": 1163760,
+      "text": "and they overstabilize the frame, so you can zoom all the way in"
+    },
+    {
+      "index": 310,
+      "startMs": 1163760,
+      "endMs": 1166757,
+      "text": "and get a shot in super creeper mode, it's great."
+    },
+    {
+      "index": 311,
+      "startMs": 1166757,
+      "endMs": 1170630,
+      "text": "But I'm just gonna shamelessly borrow a line from Mr. Mobile because he said it"
+    },
+    {
+      "index": 312,
+      "startMs": 1170630,
+      "endMs": 1175910,
+      "text": "as well as anyone possibly could, and he's right, which is just that so much of the differences"
+    },
+    {
+      "index": 313,
+      "startMs": 1175910,
+      "endMs": 1181070,
+      "text": "between these cameras, this one, the last iPhone, the Samsungs, the Pixels of the world,"
+    },
+    {
+      "index": 314,
+      "startMs": 1181070,
+      "endMs": 1186410,
+      "text": "so much of the differences between them is software that it's hardly even consistent anymore."
+    },
+    {
+      "index": 315,
+      "startMs": 1186410,
+      "endMs": 1191960,
+      "text": "So if you are looking for like a hard verdict on like iPhone 15 Pro side by side"
+    },
+    {
+      "index": 316,
+      "startMs": 1191960,
+      "endMs": 1198890,
+      "text": "versus Samsung versus Pixel or Oppo, whatever else, you kind of just have to make it up after a while,"
+    },
+    {
+      "index": 317,
+      "startMs": 1198890,
+      "endMs": 1202250,
+      "text": "like, yeah, there are gonna be certain instances, like exact zoom focal lengths"
+    },
+    {
+      "index": 318,
+      "startMs": 1202250,
+      "endMs": 1205130,
+      "text": "where one is sharper than the other, but honestly, at at the end of the day,"
+    },
+    {
+      "index": 319,
+      "startMs": 1205130,
+      "endMs": 1206900,
+      "text": "a lot of it is gonna be taste."
+    },
+    {
+      "index": 320,
+      "startMs": 1206900,
+      "endMs": 1208850,
+      "text": "And so, yeah, you just kind of have to figure out"
+    },
+    {
+      "index": 321,
+      "startMs": 1208850,
+      "endMs": 1212570,
+      "text": "which one you like as far as image quality and especially UI,"
+    },
+    {
+      "index": 322,
+      "startMs": 1212570,
+      "endMs": 1214970,
+      "text": "just the actual way you shoot photos and videos."
+    },
+    {
+      "index": 323,
+      "startMs": 1214970,
+      "endMs": 1219982,
+      "text": "Which reminds me, I do wanna mention, this RAW Max button is hilarious."
+    },
+    {
+      "index": 324,
+      "startMs": 1219982,
+      "endMs": 1225200,
+      "text": "This is a button to take your full res 48 megapixel Pro RAW photos,"
+    },
+    {
+      "index": 325,
+      "startMs": 1225200,
+      "endMs": 1228020,
+      "text": "but it just says RAW Max, okay."
+    },
+    {
+      "index": 326,
+      "startMs": 1228020,
+      "endMs": 1233210,
+      "text": "And if you want a 48 megapixel JPEG, you have to jump back into the Settings app, switch it over,"
+    },
+    {
+      "index": 327,
+      "startMs": 1233210,
+      "endMs": 1239114,
+      "text": "then bounce back, and now the button says JPEG Max, which is also hilarious."
+    },
+    {
+      "index": 328,
+      "startMs": 1239114,
+      "endMs": 1244040,
+      "text": "Last thing I gotta say though, this new Pro phone has an Action Button"
+    },
+    {
+      "index": 329,
+      "startMs": 1244040,
+      "endMs": 1248030,
+      "text": "on this new Pro iPhone only because only pros need customization."
+    },
+    {
+      "index": 330,
+      "startMs": 1248030,
+      "endMs": 1253160,
+      "text": "Look, I kind of love the Action Button, but I also need to realize"
+    },
+    {
+      "index": 331,
+      "startMs": 1253160,
+      "endMs": 1257210,
+      "text": "that it's kind of either overrated or underrated, depending on who you are."
+    },
+    {
+      "index": 332,
+      "startMs": 1257210,
+      "endMs": 1262280,
+      "text": "Like, on one hand, it's literally a customizable button, like, who even saw this coming?"
+    },
+    {
+      "index": 333,
+      "startMs": 1262280,
+      "endMs": 1266150,
+      "text": "It replaces the least used button that was on previous iPhones"
+    },
+    {
+      "index": 334,
+      "startMs": 1266150,
+      "endMs": 1268790,
+      "text": "because your phone should always be on mute anyway."
+    },
+    {
+      "index": 335,
+      "startMs": 1268790,
+      "endMs": 1273980,
+      "text": "And so, then, you can map this Action Button to basically anything you want."
+    },
+    {
+      "index": 336,
+      "startMs": 1273980,
+      "endMs": 1277100,
+      "text": "You can keep it as a mute switch and it has the same strong haptics"
+    },
+    {
+      "index": 337,
+      "startMs": 1277100,
+      "endMs": 1280670,
+      "text": "so you can tell if it's muted or unmuted in your pocket without looking."
+    },
+    {
+      "index": 338,
+      "startMs": 1280670,
+      "endMs": 1283400,
+      "text": "But there's also a bunch of other cool functions you can pick from,"
+    },
+    {
+      "index": 339,
+      "startMs": 1283400,
+      "endMs": 1289340,
+      "text": "from launching your camera to a voice recorder to just literally any app on your phone"
+    },
+    {
+      "index": 340,
+      "startMs": 1289340,
+      "endMs": 1291080,
+      "text": "you want through a Siri Shortcut."
+    },
+    {
+      "index": 341,
+      "startMs": 1291080,
+      "endMs": 1293720,
+      "text": "Your favorite YouTube channel right now is probably making a tutorial"
+    },
+    {
+      "index": 342,
+      "startMs": 1293720,
+      "endMs": 1299240,
+      "text": "on the best Siri Shortcuts to map to the Action Button from launching apps,"
+    },
+    {
+      "index": 343,
+      "startMs": 1299240,
+      "endMs": 1304159,
+      "text": "to the specific things inside of apps, from unlocking your car,"
+    },
+    {
+      "index": 344,
+      "startMs": 1304159,
+      "endMs": 1310850,
+      "text": "to not just launching my favorite task manager app, but launching a new task inside of my task manager app."
+    },
+    {
+      "index": 345,
+      "startMs": 1310850,
+      "endMs": 1315110,
+      "text": "It just lets me, it's great, it's awesome, honestly, I hope it gets copied,"
+    },
+    {
+      "index": 346,
+      "startMs": 1315110,
+      "endMs": 1317300,
+      "text": "even though a bunch of phones were doing this years ago"
+    },
+    {
+      "index": 347,
+      "startMs": 1317300,
+      "endMs": 1318133,
+      "text": "and then they stopped."
+    },
+    {
+      "index": 348,
+      "startMs": 1318133,
+      "endMs": 1321440,
+      "text": "I hope they bring it back now in a response to how great this is."
+    },
+    {
+      "index": 349,
+      "startMs": 1321440,
+      "endMs": 1325883,
+      "text": "But on the other hand, I do kind of feel like, for a lot of people,"
+    },
+    {
+      "index": 350,
+      "startMs": 1325883,
+      "endMs": 1329870,
+      "text": "this is gonna be one of those things that they play with for like three or four days"
+    },
+    {
+      "index": 351,
+      "startMs": 1329870,
+      "endMs": 1332780,
+      "text": "and then just kind of forget about it and never use it again."
+    },
+    {
+      "index": 352,
+      "startMs": 1332780,
+      "endMs": 1335540,
+      "text": "And I mostly think that's because it's not super reachable."
+    },
+    {
+      "index": 353,
+      "startMs": 1335540,
+      "endMs": 1341060,
+      "text": "Like, it's not a one handable button where your fingers usually rest for everyone,"
+    },
+    {
+      "index": 354,
+      "startMs": 1341060,
+      "endMs": 1345230,
+      "text": "especially on the Pro Max, it's way up there on the corner above the volume buttons."
+    },
+    {
+      "index": 355,
+      "startMs": 1345230,
+      "endMs": 1349370,
+      "text": "It could be a cool shutter button for the camera, but the volume buttons already do that,"
+    },
+    {
+      "index": 356,
+      "startMs": 1349370,
+      "endMs": 1352550,
+      "text": "so yeah, I feel like you might as well just end up setting it back to a mute switch"
+    },
+    {
+      "index": 357,
+      "startMs": 1352550,
+      "endMs": 1354860,
+      "text": "and forgetting about it after a few weeks."
+    },
+    {
+      "index": 358,
+      "startMs": 1354860,
+      "endMs": 1356240,
+      "text": "But I guess that's fine too."
+    },
+    {
+      "index": 359,
+      "startMs": 1356240,
+      "endMs": 1358880,
+      "text": "It's one of those things that you'll just figure out which user you are"
+    },
+    {
+      "index": 360,
+      "startMs": 1358880,
+      "endMs": 1360365,
+      "text": "after you use it for a while."
+    },
+    {
+      "index": 361,
+      "startMs": 1360365,
+      "endMs": 1364280,
+      "text": "Kinda like I've been using that Eight Sleep mattress cover that I was talking about,"
+    },
+    {
+      "index": 362,
+      "startMs": 1364280,
+      "endMs": 1369320,
+      "text": "I've been using it for about three months now, this is the pod cover that goes on your mattress"
+    },
+    {
+      "index": 363,
+      "startMs": 1369320,
+      "endMs": 1372620,
+      "text": "that either warms you up or cools you down, helps you sleep."
+    },
+    {
+      "index": 364,
+      "startMs": 1372620,
+      "endMs": 1376520,
+      "text": "Like, now that I've used it for a while, I've understood, like I was a skeptic at first,"
+    },
+    {
+      "index": 365,
+      "startMs": 1376520,
+      "endMs": 1381740,
+      "text": "but honestly, it's one of those things where I go to a hotel bed and I have a harder time sleeping,"
+    },
+    {
+      "index": 366,
+      "startMs": 1381740,
+      "endMs": 1387590,
+      "text": "which it used to be the other way around, but I just sleep so much better in the Eight Sleep bed"
+    },
+    {
+      "index": 367,
+      "startMs": 1387590,
+      "endMs": 1392330,
+      "text": "'cause it's cooled down to let you get sleep early and then warms up in the morning to help you wake up."
+    },
+    {
+      "index": 368,
+      "startMs": 1392330,
+      "endMs": 1395630,
+      "text": "And it's become really clear that temperature is one of the most important factors"
+    },
+    {
+      "index": 369,
+      "startMs": 1395630,
+      "endMs": 1398240,
+      "text": "when it comes to sleep, and it's become real obvious to me"
+    },
+    {
+      "index": 370,
+      "startMs": 1398240,
+      "endMs": 1403010,
+      "text": "that falling asleep faster, getting better quality sleep and then being able to depend on it"
+    },
+    {
+      "index": 371,
+      "startMs": 1403010,
+      "endMs": 1404870,
+      "text": "is something I wouldn't trade for anything."
+    },
+    {
+      "index": 372,
+      "startMs": 1404870,
+      "endMs": 1407300,
+      "text": "It's just, it took me some time to learn that."
+    },
+    {
+      "index": 373,
+      "startMs": 1407300,
+      "endMs": 1411350,
+      "text": "Plus there's an app that shows me all my info about my sleep every night"
+    },
+    {
+      "index": 374,
+      "startMs": 1411350,
+      "endMs": 1413600,
+      "text": "and it lets me adjust the autopilot if I want."
+    },
+    {
+      "index": 375,
+      "startMs": 1413600,
+      "endMs": 1416480,
+      "text": "If your partner sleeps at a different side on the same bed,"
+    },
+    {
+      "index": 376,
+      "startMs": 1416480,
+      "endMs": 1419420,
+      "text": "they can adjust the temperature in the app too, it's great."
+    },
+    {
+      "index": 377,
+      "startMs": 1419420,
+      "endMs": 1422000,
+      "text": "So I'll leave a link to it below, and since they're a great sponsor,"
+    },
+    {
+      "index": 378,
+      "startMs": 1422000,
+      "endMs": 1429443,
+      "text": "they're actually giving you guys $200 off the pod cover if you use code \"MKBHD\" at eightsleep.com/mkbhd."
+    },
+    {
+      "index": 379,
+      "startMs": 1430340,
+      "endMs": 1431691,
+      "text": "But anyway, what's the verdict?"
+    },
+    {
+      "index": 380,
+      "startMs": 1431691,
+      "endMs": 1436343,
+      "text": "What's the verdict with the new Pro iPhone of 2023?"
+    },
+    {
+      "index": 381,
+      "startMs": 1437360,
+      "endMs": 1440540,
+      "text": "It's one of those things where like I have conversations with friends"
+    },
+    {
+      "index": 382,
+      "startMs": 1440540,
+      "endMs": 1443600,
+      "text": "and I always end up having to try to condense it all"
+    },
+    {
+      "index": 383,
+      "startMs": 1443600,
+      "endMs": 1446570,
+      "text": "and summarize it into like one sentence, and the truth is like,"
+    },
+    {
+      "index": 384,
+      "startMs": 1446570,
+      "endMs": 1450440,
+      "text": "it's the same phone as last year with USB, a little bit of a faster chip,"
+    },
+    {
+      "index": 385,
+      "startMs": 1450440,
+      "endMs": 1453740,
+      "text": "a little bit of a brighter screen, a little bit of thinner bezels,"
+    },
+    {
+      "index": 386,
+      "startMs": 1453740,
+      "endMs": 1457100,
+      "text": "and like, I don't know, better cameras, that's kind of it."
+    },
+    {
+      "index": 387,
+      "startMs": 1457100,
+      "endMs": 1459710,
+      "text": "So you have to decide how much of that is important to you."
+    },
+    {
+      "index": 388,
+      "startMs": 1459710,
+      "endMs": 1462290,
+      "text": "Are any of those things important to you?"
+    },
+    {
+      "index": 389,
+      "startMs": 1462290,
+      "endMs": 1469673,
+      "text": "Honestly, USB might be the most important thing about the new iPhone, despite what Apple was hoping."
+    },
+    {
+      "index": 390,
+      "startMs": 1470780,
+      "endMs": 1473150,
+      "text": "Welcome to the club, my friends."
+    },
+    {
+      "index": 391,
+      "startMs": 1473150,
+      "endMs": 1477224,
+      "text": "Thanks for watching, catch you guys in the next one, peace."
+    },
+    {
+      "index": 392,
+      "startMs": 1477224,
+      "endMs": 1479891,
+      "text": "(upbeat music)"
+    }
+  ]
+}
