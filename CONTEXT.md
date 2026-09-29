@@ -73,6 +73,9 @@ Its address — `LAYA_ENDPOINT` — and the `/health` beside it (`healthUrlFor`)
 only in `src/laya.js`; every other file imports them.
 **Code heuristic** — the stand-in that answers from a phrase dictionary when the
 server is down or running without a checkpoint. It is what the tests and `--fake`
-runs measure, and every verdict it gives is labelled `heuristic`.
+runs measure, and every verdict it gives is labelled `heuristic`. It enters the
+pipeline as any judge does — through `heuristicAnswer(cards, { model })`, the one
+wrapper that dresses its scores in the judge seam's `{ probabilities, model,
+heuristic }` shape.
 **Panel** — the watch-page UI: the reads with their ranges, the log of every question
 with its probability and latency, and the confidence the boundaries were cut at.

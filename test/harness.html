@@ -64,7 +64,7 @@
     import { createPanel } from "../src/panel.js";
     import { indexLines, msToLabel } from "../src/transcript.js";
     import { detectSponsors, DEFAULTS as PIPELINE_DEFAULTS } from "../src/detector.js";
-    import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
+    import { heuristicAnswer, makeJudge } from "../src/sponsor.js";
     import { judgeBatch, LAYA_ENDPOINT } from "../src/laya.js";
     import { parsePastedTranscript } from "../src/transcript.js";
 
@@ -195,7 +195,7 @@
             return await judgeBatch({ state: judgeState, candidates, questions, endpoint });
           } catch (err) {
             state.lastError = err.message;
-            return { error: err.message, probabilities: heuristicProbabilities(candidates), model: "heuristic (offline)" };
+            return { error: err.message, ...heuristicAnswer(candidates, { model: "heuristic (offline)" }) };
           }
         },
         log: (entry) => state.log.push({ ...entry, at_: Date.now() }),

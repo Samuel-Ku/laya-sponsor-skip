@@ -9,7 +9,7 @@ import { test } from "node:test";
 
 import { formatLines, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
 import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
-import { CRITERIA, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor } from "../src/sponsor.js";
+import { CRITERIA, heuristicAnswer, heuristicProbabilities, HEURISTIC_MODEL, lineCard, makeJudge, pageOf, questionsFor } from "../src/sponsor.js";
 import { compareReads, pairReads } from "../src/sponsorblock.js";
 import { MAX_CANDIDATES_PER_REQUEST, buildRequest, healthUrlFor, isHeuristic, LAYA_ENDPOINT, LAYA_HEALTH_ENDPOINT, parseResponse } from "../src/laya.js";
 
@@ -22,7 +22,7 @@ const stubJudge = (probsFor) => async ({ cards, questions }) => {
   return { probabilities: probsFor(cards), model: "stub", heuristic: false };
 };
 
-const heuristicJudge = async ({ cards }) => ({ probabilities: heuristicProbabilities(cards), model: "heuristic", heuristic: true });
+const heuristicJudge = async ({ cards }) => heuristicAnswer(cards, { model: "heuristic" });
 
 test("mergeCues: merges short cues, breaks on pauses and sentence ends", () => {
   const cues = [
@@ -320,6 +320,16 @@ test("compareReads: oneToOne pairs each read with at most one segment — the ev
   assert.equal(crowded.matched, 1);
   assert.equal(crowded.extra, 1);
   assert.deepEqual(crowded.oursAlone, [{ startMs: 100_000, endMs: 160_000 }]);
+});
+
+test("heuristicAnswer dresses the heuristic in the judge seam's exact shape", () => {
+  // The one wrapper both paths consume when the code stand-in answers — callers
+  // no longer hand-roll it with their own spelling of the model name.
+  const cards = [{ text: "Today's video is sponsored by Brewmaster." }];
+  const answer = heuristicAnswer(cards);
+  assert.deepEqual(answer, { probabilities: heuristicProbabilities(cards), model: "heuristic", heuristic: true });
+  assert.equal(answer.model, HEURISTIC_MODEL);
+  assert.deepEqual(heuristicAnswer(cards, { model: "heuristic (--fake)" }).model, "heuristic (--fake)");
 });
 
 test("pairReads: shared time picks the partner, ties keep the first segment", () => {
