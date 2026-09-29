@@ -42,8 +42,9 @@
   <h1>⏭️ Laya Sponsor Skip — harness</h1>
   <p class="lead">
     A fake 5:50 video whose transcript is <code>test/fixtures/demo-transcript.json</code>, with two
-    hand-labelled sponsor reads. Analyze runs the real pipeline against the local judge on
-    127.0.0.1:8765; if the server is down, a code heuristic answers and the panel says so in its badge.
+    hand-labelled sponsor reads. Analyze runs the real pipeline against the local judge at the
+    address <code>src/laya.js</code> owns; if the server is down, a code heuristic answers and the panel
+    says so in its badge.
   </p>
 
   <div class="fake">
@@ -64,10 +65,10 @@
     import { indexLines, msToLabel } from "../src/transcript.js";
     import { detectSponsors, DEFAULTS as PIPELINE_DEFAULTS } from "../src/detector.js";
     import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
-    import { judgeBatch } from "../src/laya.js";
+    import { judgeBatch, LAYA_ENDPOINT } from "../src/laya.js";
     import { parsePastedTranscript } from "../src/transcript.js";
 
-    const endpoint = new URLSearchParams(location.search).get("judge") ?? "http://127.0.0.1:8765/judge";
+    const endpoint = new URLSearchParams(location.search).get("judge") ?? LAYA_ENDPOINT; // the address lives in laya.js
     const fixtureJson = await (await fetch("./fixtures/demo-transcript.json")).json();
     const fixture = { ...fixtureJson, lines: indexLines(fixtureJson.lines) };
 

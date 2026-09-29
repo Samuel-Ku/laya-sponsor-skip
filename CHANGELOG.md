@@ -43,6 +43,13 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
   Same numbers on the six real videos as before (2/4, 0 false positives, controls
   clean); the rules just cannot drift apart any more.
 
+- **One place owns the judge's address.** `LAYA_ENDPOINT` in `src/laya.js` is the only
+  definition of `http://127.0.0.1:8765/judge` in the codebase; the service worker, the
+  popup, both eval scripts and the harness pages import it, and `healthUrlFor()` derives
+  the `/health` address the popup's Test button and the evals check. The popup's script is
+  a module now so it can import the constant, and its input's placeholder is filled from
+  it instead of a second copy in the HTML. `LAYA_ENDPOINT=...` still overrides it everywhere.
+
 ### Added
 
 - **`npm run real-check`** — six real videos whose transcripts are the videos' own

@@ -15,9 +15,9 @@ import { readFileSync } from "node:fs";
 import { indexLines, msToLabel } from "../src/transcript.js";
 import { detectSponsors } from "../src/detector.js";
 import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
-import { checkServer, judgeBatch } from "../src/laya.js";
+import { checkServer, healthUrlFor, judgeBatch, LAYA_ENDPOINT } from "../src/laya.js";
 
-const DEFAULT_ENDPOINT = "http://127.0.0.1:8765/judge";
+const DEFAULT_ENDPOINT = LAYA_ENDPOINT; // the address lives in laya.js
 
 const fixtureJson = JSON.parse(readFileSync(new URL("./fixtures/demo-transcript.json", import.meta.url), "utf8"));
 const fixture = { ...fixtureJson, lines: indexLines(fixtureJson.lines) };
@@ -50,7 +50,7 @@ const fmt = (ms) => msToLabel(ms);
 console.log(`fixture: ${fixture.lines.length} lines, ${fixture.video.durationMs / 1000}s, ${expected.reads.length} labelled read(s)`);
 if (!fake) {
   try {
-    const health = await checkServer({ endpoint: endpoint.replace(/\/judge\/?$/, "/health") });
+    const health = await checkServer({ endpoint: healthUrlFor(endpoint) });
     console.log(`server: ${health.model}`);
     if (/heuristic/.test(String(health.model))) {
       console.log("note: no checkpoint is loaded on that server, so the code heuristic answers (the panel says so too)");

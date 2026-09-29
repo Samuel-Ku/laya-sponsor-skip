@@ -29,9 +29,9 @@ import { indexLines, msToLabel } from "../src/transcript.js";
 import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
 import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
 import { pairReads } from "../src/sponsorblock.js";
-import { checkServer, judgeBatch } from "../src/laya.js";
+import { checkServer, healthUrlFor, judgeBatch, LAYA_ENDPOINT } from "../src/laya.js";
 
-const DEFAULT_ENDPOINT = "http://127.0.0.1:8765/judge";
+const DEFAULT_ENDPOINT = LAYA_ENDPOINT; // the address lives in laya.js
 const endpoint = process.env.LAYA_ENDPOINT ?? DEFAULT_ENDPOINT;
 const fake = process.argv.includes("--fake");
 
@@ -107,7 +107,7 @@ if (fake) {
   strict = false;
 } else {
   try {
-    const health = await checkServer({ endpoint: endpoint.replace(/\/judge\/?$/, "/health") });
+    const health = await checkServer({ endpoint: healthUrlFor(endpoint) });
     model = health.model;
     strict = !/heuristic/i.test(String(model));
   } catch {

@@ -69,6 +69,8 @@ exactly where one read spans two segments.
 line inside a sponsor read?", "is this the first line of one?", "does this line still
 belong to the read after it?" In the extension it is the local server behind
 `POST /judge` (`src/laya.js`); everywhere it is injected as `judge({ cards, questions })`.
+Its address — `LAYA_ENDPOINT` — and the `/health` beside it (`healthUrlFor`) are defined
+only in `src/laya.js`; every other file imports them.
 **Code heuristic** — the stand-in that answers from a phrase dictionary when the
 server is down or running without a checkpoint. It is what the tests and `--fake`
 runs measure, and every verdict it gives is labelled `heuristic`.
