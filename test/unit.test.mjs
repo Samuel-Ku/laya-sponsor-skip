@@ -8,6 +8,7 @@ import { test } from "node:test";
 
 import { formatLines, groupRuns, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
 import { CRITERIA, DEFAULTS, detectSponsors, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor, refineCandidate } from "../src/sponsor.js";
+import { BRIDGE_MS, bridgeLinesFor, deriveRuns } from "../src/detector.js";
 import { MAX_CANDIDATES_PER_REQUEST, buildRequest, isHeuristic, parseResponse } from "../src/laya.js";
 
 const fixtureJson = JSON.parse(readFileSync(new URL("./fixtures/demo-transcript.json", import.meta.url), "utf8"));
@@ -62,6 +63,41 @@ test("groupRuns: finds runs of at least minRun", () => {
   assert.deepEqual(groupRuns([false, true, true, false, true], { minRun: 2 }), [{ from: 1, to: 2 }]);
   assert.deepEqual(groupRuns([true, true, false], { minRun: 2 }), [{ from: 0, to: 1 }]);
   assert.deepEqual(groupRuns([true, false, true, true, true], { minRun: 2 }), [{ from: 2, to: 4 }]);
+});
+
+/** A transcript of `count` six-second lines, so the bridge budget is 10 lines. */
+const flatLines = (count) => Array.from({ length: count }, (_, i) => ({ index: i + 1, startMs: i * 6000, endMs: i * 6000 + 6000, text: `line ${i + 1}` }));
+
+/** flags from a list of indices that read as sponsor, `null` for unjudged lines. */
+const flagsFor = (count, yes = [], unknown = []) =>
+  Array.from({ length: count }, (_, i) => (yes.includes(i) ? true : unknown.includes(i) ? null : false));
+
+test("deriveRuns: a read bridges a middle that was judged and found quiet", () => {
+  const lines = flatLines(20);
+  assert.equal(bridgeLinesFor(lines), 10); // 60 s at 6 s a line
+  // Two pockets of yeses (the lead-in and the offer) with eight quiet lines between:
+  // the shape of the Surfshark read in the real fixtures, and the reason the live
+  // loop used to find nothing at all.
+  assert.deepEqual(deriveRuns(lines, flagsFor(20, [2, 3, 12, 13])), [{ from: 2, to: 13 }]);
+});
+
+test("deriveRuns: a middle that was never judged is not bridgeable", () => {
+  const lines = flatLines(20);
+  // The same two pockets, but nobody has asked about line 7: a read may bridge what
+  // it has heard and found quiet, never what it has not heard.
+  assert.deepEqual(deriveRuns(lines, flagsFor(20, [2, 3, 12, 13], [7])), [
+    { from: 2, to: 3 },
+    { from: 12, to: 13 },
+  ]);
+});
+
+test("deriveRuns: a gap wider than the budget stays two runs", () => {
+  const lines = flatLines(40);
+  assert.deepEqual(deriveRuns(lines, flagsFor(40, [2, 3, 20, 21])), [
+    { from: 2, to: 3 },
+    { from: 20, to: 21 },
+  ]);
+  assert.equal(BRIDGE_MS, 60000);
 });
 
 test("parseJson3 and parseVtt produce cues", () => {
@@ -176,7 +212,7 @@ test("detectSponsors finds both reads with a stubbed judge that answers from the
       return fixture.expected.reads.some((r) => t >= r.startMs && t < r.endMs) ? 0.95 : 0.05;
     }),
   );
-  const result = await detectSponsors({ video: fixture.video, lines: fixture.lines, judge, settings: { stride: 1 } });
+  const result = await detectSponsors({ video: fixture.video, lines: fixture.lines, judge });
   assert.equal(result.reads.length, 2);
   assert.equal(result.reads[0].startMs, first.startMs);
   assert.equal(result.reads[0].endMs, first.endMs);

@@ -13,6 +13,7 @@
 
 import { mergeCues, msToLabel, parsePastedTranscript } from "./transcript.js";
 import { DEFAULTS as SPONSOR_DEFAULTS, detectSponsors, judgeIndices, makeJudge, refineCandidate } from "./sponsor.js";
+import { deriveRuns } from "./detector.js";
 import { createPanel, showToast } from "./panel.js";
 import * as yt from "./youtube.js";
 
@@ -155,26 +156,26 @@ async function judgeNewLines(lines) {
   state.judgedUpTo = Math.max(state.judgedUpTo, upto + 1);
 }
 
-function flagsArray(lines) {
-  return lines.map((_, i) => (state.flags.get(i) ?? 0) >= state.settings.threshold);
+/**
+ * What we know about each line: yes, no, or `null` while nobody has judged it.
+ * The detector needs that third value: a read may bridge a quiet middle it has
+ * heard, and must not bridge one it has not.
+ */
+function verdicts(lines) {
+  return lines.map((_, i) => {
+    const p = state.flags.get(i);
+    return p == null ? null : p >= state.settings.threshold;
+  });
 }
 
 /**
- * Every run of yeses, plus the one at the tail of the transcript if it is still
- * open — we may be inside it right now, which is the live counterpart of the
+ * Every candidate run the detector finds — the same derivation the batch pass
+ * uses, bridge included — plus the one at the tail of the transcript if it is
+ * still open. We may be inside it right now, which is the live counterpart of the
  * audio modes upstream: the end is not known until the speaker is done.
  */
 function runs(lines) {
-  const flags = flagsArray(lines);
-  const found = [];
-  let start = -1;
-  for (let i = 0; i < flags.length; i++) {
-    if (flags[i] && start < 0) start = i;
-    if ((!flags[i] || i === flags.length - 1) && start >= 0) {
-      found.push({ from: start, to: flags[i] ? i : i - 1 });
-      start = -1;
-    }
-  }
+  const found = deriveRuns(lines, verdicts(lines));
 
   state.openRead = null;
   const closedRuns = found.slice();
@@ -209,6 +210,10 @@ function overlaps(a, b) {
 async function updateReads(lines) {
   const closed = runs(lines);
   for (const run of closed) {
+    // The same cap the batch pass applies: `maxReads` is a documented limit on
+    // what this extension will skip in one video, and it is worth nothing if only
+    // the Analyze button honours it.
+    if (state.reads.length >= state.settings.maxReads) break;
     const run_ = { startMs: lines[run.from].startMs, endMs: lines[run.to].endMs };
     const key = `L${lines[run.from].index}`;
     // The same read must not be refined (or skipped) twice: ticks are 2.5 s apart

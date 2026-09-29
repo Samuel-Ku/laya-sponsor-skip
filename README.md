@@ -60,11 +60,15 @@ does the seeking.
    Every request carries `state.page` (video title, channel) and one self-contained
    `candidates[i]` card per line (text plus the lines on either side), because that is
    all the server forwards to the model.
-4. **Runs and boundaries (code)** – lines above `P ≥ 0.70` are grouped into runs; the
-   edges are asked about with the sharper questions, the lead-in is walked back line by
-   line, and a boundary is only cut above `P ≥ 0.80` (upstream's phrase rule). Reads
-   shorter than 20 s are dropped, reads longer than 3 minutes are **not** skipped at
-   all, at most 6 per video.
+4. **Runs and boundaries (code)** – lines above `P ≥ 0.70` are grouped into runs, and
+   two runs are joined when the middle between them was judged and read as plain text:
+   a read's pitch often names nothing for a minute, so the lead-in pocket and the offer
+   pocket are only one read because of that bridge (`src/detector.js`). The edges are
+   asked about with the sharper questions, the lead-in is walked back line by line, and
+   a boundary is only cut above `P ≥ 0.80` (upstream's phrase rule). Reads shorter than
+   20 s are dropped, reads longer than 3 minutes are **not** skipped at all, at most 6
+   per video — and the live loop and the Analyze button cross this same derivation, so
+   a rule added to one is a rule both get.
 5. **Act (code)** – a read is skipped by setting `video.currentTime` to the first line
    that reads as content again. While a read is still open, the video steps forward by
    10 s at a time as long as the newest line still reads as a read — the same trade the
@@ -178,7 +182,7 @@ turn into a read. `live-check` fails if a labelled read is missed, if a read ble
 than 8 s into the content after it, or if anything that is not a read gets reported.
 
 With the server in heuristic mode (no checkpoint), the fixture scores **2/2 reads,
-start +7.0 s / +0.0 s, end +0.0 s / +7.0 s, 13 local calls, 48 questions, 46 ms**.
+start +7.0 s / +0.0 s, end +0.0 s / +7.0 s, 17 local calls, 72 questions, 29 ms**.
 With the real multilingual checkpoint the boundaries should tighten: the heuristic
 cannot answer the "is the read over here?" question at all, so its ends can be a
 line late, and its starts stop one line early.
@@ -203,17 +207,23 @@ labels are empty is a control that must stay silent. The judge is whatever the s
 reports: with a checkpoint loaded the run is **strict** (any miss or false positive
 exits 1), with no checkpoint it measures the code heuristic and says so.
 
+The check drives the **live path** — lines judged as they arrive, the shared detector
+deciding which runs are reads, each closed run refined once — because that is the path
+that does the skipping. It then runs the batch pass over the same transcript and fails
+if the live path loses a labelled read the batch pass found, which is the bug the two
+paths had between them before.
+
 Sponsor reads of different shapes, plus two controls:
 
 | Video | The read | SponsorBlock | Code stand-in (`--fake`) | Judge on 8765 |
 | --- | --- | --- | --- | --- |
-| `CLkMCNkwCjI` — UltimateiDeviceVids | Surfshark VPN: mid-roll with a spoken intro and a thank-you outro | 2:42–4:09 | ✅ 2:52–4:06 (start +9.9 s, end −3.6 s) | ✅ 2:34–4:03 (−8.1 s, −5.8 s) + 3 false reads |
-| `brqtaTjBkB0` — Hardware Canucks | Drop: named sponsor, "a quick word from today's video sponsor" … "check it out down below" | 6:16–6:54 | ✅ 6:16–7:10 (start +0.5 s, end +16.0 s) | ❌ missed + 5 false reads |
-| `cBpGq-vDr2Y` — Marques Brownlee | Eight Sleep: a personal-story read whose offer is compressed into a single "use code" line | 22:40–23:50 | ❌ missed | ✅ 22:57–24:37 (+16.4 s, +46.8 s) + 4 false reads |
+| `CLkMCNkwCjI` — UltimateiDeviceVids | Surfshark VPN: mid-roll with a spoken intro and a thank-you outro | 2:42–4:09 | ✅ 2:52–4:06 (start +9.9 s, end −3.6 s) | ✅ 2:34–4:03 (−8.1 s, −5.8 s) + 2 false reads |
+| `brqtaTjBkB0` — Hardware Canucks | Drop: named sponsor, "a quick word from today's video sponsor" … "check it out down below" | 6:16–6:54 | ✅ 6:16–7:10 (start +0.5 s, end +16.0 s) | ❌ missed + 2 false reads |
+| `cBpGq-vDr2Y` — Marques Brownlee | Eight Sleep: a personal-story read whose offer is compressed into a single "use code" line | 22:40–23:50 | ❌ missed | ❌ missed + 6 false reads |
 | `aircAruvnKk` — 3Blue1Brown | SponsorBlock segment over a **wordless outro** — no captions in it at all | 18:26–18:53 | ⏭️ skipped, unjudgable | ⏭️ skipped, unjudgable |
-| `JwAfHEHQKto` — control | no sponsor segment | — | ✅ silent | ❌ 4 false reads |
-| `rS7scGrFsRo` — control | no sponsor segment | — | ✅ silent | ❌ 2 false reads |
-| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (133 calls, 758 questions) | **2/4 found · 22 false positives · controls 0/2 clean** (238 calls, 1041 questions) |
+| `JwAfHEHQKto` — control | no sponsor segment | — | ✅ silent | ❌ 6 false reads |
+| `rS7scGrFsRo` — control | no sponsor segment | — | ✅ silent | ❌ 1 false read |
+| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (388 live calls, 255 batch) | **1/4 found · 23 false positives · controls 0/2 clean** (508 live calls, 351 batch) |
 
 The two runs differ in one thing only: who answered the questions.
 
@@ -223,7 +233,9 @@ and never fires on the two controls, but it misses the MKBHD read, where the spo
 introduced as a mattress the reviewer has *been using* and the price is mentioned once —
 there is no phrase in the read to match, which is precisely the gap a model is supposed
 to fill. Its boundaries are a line off: the start stops one line early because the
-heuristic cannot answer "is the read over here?".
+heuristic cannot answer "is the read over here?". Those two reads are only found at all
+because of the bridge: the lead-in pocket scores yes, the offer pocket scores yes a
+minute later, and the pitch in between names nothing.
 
 **The judge on `127.0.0.1:8765`** in this environment was `server_bert.py`, which serves
 `bondarchukb/bert-ads-classification` on `mps` — a stand-in that never reads the
@@ -233,18 +245,25 @@ this text look like an advertisement?"*, not *"is this spoken line inside a spon
 and the answers are noise for this task: it scores `this video is sponsored by surfshark vpn`
 at **0.06** and `so the question is whether this deal is actually worth it for most people`
 at **0.999**. The pipeline then does the only thing it can — it skips what the judge
-points at — which is why that column has 22 false positives and why the run exits red.
+points at — which is why that column has 23 false positives and why the run exits red.
 Those numbers measure the stand-in, not the pipeline: with a checkpoint that answers the
 narrow question, the same four segments are the ones to beat.
 
-Two things came out of writing this harness, and both are now enforced rather than
-noted. A run that silently fell back to the code heuristic used to print numbers that
-looked like the model's; a fallback is now a hard failure with the failing call in the
-summary. And `makeJudge` used to lose the judge whenever the caller passed no video
+That column also shows why the cap is a policy and not a courtesy: a judge that fires
+on a third of the transcript fills the six-read budget before the real read arrives, so
+the live path never gets to MKBHD's. Both paths now honour `maxReads`, which is what the
+popup has always claimed.
+
+Three things came out of writing this harness, and all three are now enforced rather
+than noted. A run that silently fell back to the code heuristic used to print numbers
+that looked like the model's; a fallback is now a hard failure with the failing call in
+the summary. `makeJudge` used to lose the judge whenever the caller passed no video
 metadata — `pageOf(video)` threw before the transport was ever called, so every verdict
-came from the heuristic while the summary still named the server's model — so
-`pageOf` now treats a missing page as an empty one, and the harness reports the address
-it actually called together with the number of local calls.
+came from the heuristic while the summary still named the server's model — so `pageOf`
+now treats a missing page as an empty one. And the two paths used to derive their runs
+with two different pieces of code, which is how the bridge ended up in the batch pass
+and not in the live loop: the check now fails if the live path loses a labelled read the
+batch pass found.
 
 ## What leaves your browser
 
@@ -271,6 +290,11 @@ except the optional **Compare with SponsorBlock** button, which asks
   in the panel — see [Real videos](#real-videos) for what that costs.
 - **A whole read is skipped or none of it is.** A read longer than 3 minutes is not
   skipped at all: skipping that much of a video on a probability is not worth the risk.
+- **Two reads less than a minute apart can be bridged into one** and skipped together —
+  that is the price of finding the reads whose middle names nothing. A read longer than
+  3 minutes after bridging is rejected whole, which is what keeps the price bounded.
+- **Six reads is the budget for a whole video**, in both paths. A judge that fires on
+  plain talk spends it early and the real reads never get refined.
 - The transcript only grows as the video plays. Watching a 20-minute video from the
   start means ~200 lines and ~35 local calls for real judgments (about one second of
   local compute in total) — but a video you open in the middle starts with an empty
