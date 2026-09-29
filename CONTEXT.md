@@ -50,6 +50,19 @@ them, which the live path cannot, because the live path meets a run before it kn
 what comes after it. The eval fails if the live path loses a labelled read the batch
 path found.
 
+## Comparing with SponsorBlock
+
+**Comparison** — `compareReads(mine, theirs)` in `src/sponsorblock.js`, the only
+place that decides whether a read "matches" a community segment. Returns the
+three-way split both callers report: matched, ours alone, theirs alone.
+**Containment** — the watch page's rule: a read caught a segment when it covers it
+with 5 s of slack at each edge. Nothing exclusive — one read may cover two
+segments, two reads may cover one.
+**Pairing** — the eval's rule (`pairReads`): each read takes the segment it shares
+the most time with, each segment at most once. A read paired with nothing is a
+false positive; a segment nobody paired with is a miss. Stricter than containment
+exactly where one read spans two segments.
+
 ## The judge
 
 **Judge** — whatever answers a typed `noul` question about one line card: "is this

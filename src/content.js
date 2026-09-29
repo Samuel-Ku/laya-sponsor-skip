@@ -14,6 +14,7 @@
 import { mergeCues, msToLabel, parsePastedTranscript } from "./transcript.js";
 import { makeJudge } from "./sponsor.js";
 import { createDetector, DEFAULTS as SPONSOR_DEFAULTS, detectSponsors } from "./detector.js";
+import { compareReads } from "./sponsorblock.js";
 import { createPanel, showToast } from "./panel.js";
 import * as yt from "./youtube.js";
 
@@ -342,9 +343,9 @@ async function compareWithSponsorBlock() {
       showToast("SponsorBlock has no labels for this video");
       return;
     }
-    const mine = state.reads;
-    const caught = theirs.filter((seg) => mine.some((r) => r.startMs <= seg.startMs + 5000 && r.endMs >= seg.endMs - 5000));
-    const extra = mine.filter((r) => !theirs.some((seg) => r.startMs <= seg.startMs + 5000 && r.endMs >= seg.endMs - 5000));
+    // Whether a read "matches" a community segment is decided in one place —
+    // src/sponsorblock.js — so this button and the eval script cannot drift apart.
+    const { matched: caught, extra } = compareReads(state.reads, theirs);
     pushLog({
       kind: "sponsorblock",
       verdict: `${caught.length}/${theirs.length} community reads found, ${extra.length} read(s) of ours they do not have`,

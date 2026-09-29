@@ -1,5 +1,6 @@
 // Unit tests for the pure parts: transcript plumbing, question building, the
-// code heuristic and the pipeline running against a stubbed judge.
+// code heuristic, the SponsorBlock comparison and the pipeline running against a
+// stubbed judge.
 //   npm test
 
 import assert from "node:assert/strict";
@@ -9,6 +10,7 @@ import { test } from "node:test";
 import { formatLines, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
 import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
 import { CRITERIA, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor } from "../src/sponsor.js";
+import { compareReads, pairReads } from "../src/sponsorblock.js";
 import { MAX_CANDIDATES_PER_REQUEST, buildRequest, isHeuristic, parseResponse } from "../src/laya.js";
 
 const fixtureJson = JSON.parse(readFileSync(new URL("./fixtures/demo-transcript.json", import.meta.url), "utf8"));
@@ -279,6 +281,55 @@ test("the pipeline falls back to the code heuristic when the judge does", async 
     assert.ok(Math.abs(result.reads[i].startMs - expected.startMs) <= fixture.expected.startToleranceMs);
     assert.ok(Math.abs(result.reads[i].endMs - expected.endMs) <= fixture.expected.endToleranceMs);
   }
+});
+
+test("compareReads: containment with slack — the watch page's rule", () => {
+  const seg = { startMs: 100_000, endMs: 160_000 };
+  assert.equal(compareReads([{ startMs: 100_000, endMs: 160_000 }], [seg]).matched, 1);
+  // within the 5 s slack at each edge
+  assert.equal(compareReads([{ startMs: 103_000, endMs: 158_000 }], [seg]).matched, 1);
+  // 8 s late at the start: outside the slack, so a miss and an extra of ours
+  const late = compareReads([{ startMs: 108_000, endMs: 160_000 }], [seg]);
+  assert.equal(late.matched, 0);
+  assert.equal(late.extra, 1);
+  assert.equal(late.missed, 1);
+  // nothing is exclusive: one read covering two segments counts both,
+  // and two reads over one segment leave nothing missed or extra
+  const wide = { startMs: 90_000, endMs: 210_000 };
+  const two = [seg, { startMs: 170_000, endMs: 200_000 }];
+  assert.deepEqual(compareReads([wide], two), { total: 2, matched: 2, extra: 0, missed: 0, oursAlone: [], theirsAlone: [] });
+  const split = compareReads([{ startMs: 95_000, endMs: 205_000 }, { startMs: 98_000, endMs: 162_000 }], [seg]);
+  assert.equal(split.matched, 1);
+  assert.equal(split.extra, 0);
+  assert.equal(split.missed, 0);
+});
+
+test("compareReads: oneToOne pairs each read with at most one segment — the eval's rule", () => {
+  const seg = { startMs: 100_000, endMs: 160_000 };
+  const other = { startMs: 170_000, endMs: 200_000 };
+  // the containment rule and the pairing rule disagree exactly where one read
+  // spans two segments: containment credits both, pairing makes the second a miss
+  const wide = { startMs: 90_000, endMs: 210_000 };
+  const paired = compareReads([wide], [seg, other], { oneToOne: true });
+  assert.equal(paired.matched, 1); // the wider share wins: 60 s over seg, 30 s over other
+  assert.equal(paired.extra, 0);
+  assert.equal(paired.missed, 1);
+  assert.deepEqual(paired.theirsAlone, [other]);
+  // a read that arrives after the segment was taken is paired with nothing
+  const crowded = compareReads([{ startMs: 95_000, endMs: 165_000 }, { startMs: 100_000, endMs: 160_000 }], [seg], { oneToOne: true });
+  assert.equal(crowded.matched, 1);
+  assert.equal(crowded.extra, 1);
+  assert.deepEqual(crowded.oursAlone, [{ startMs: 100_000, endMs: 160_000 }]);
+});
+
+test("pairReads: shared time picks the partner, ties keep the first segment", () => {
+  const read = { startMs: 0, endMs: 100_000 };
+  const first = { startMs: 0, endMs: 60_000 };
+  const second = { startMs: 40_000, endMs: 100_000 };
+  const { pairs, matched } = pairReads([read], [first, second]);
+  assert.equal(pairs[0].seg, first); // 60 s shared, both — first wins, deterministically
+  assert.equal(matched.size, 1);
+  assert.deepEqual(pairReads([], []).pairs, []);
 });
 
 test("a missing video page never costs a judge call", async () => {
