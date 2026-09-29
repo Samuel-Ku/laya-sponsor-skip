@@ -4,6 +4,32 @@ Notable changes. Versions are tagged `v*`; each tag's section below becomes the
 GitHub Release notes automatically (`.github/workflows/release.yml`), so keep
 one `## [ vX.Y.Z ] — title (date)` section per release.
 
+## [Unreleased]
+
+### Fixed
+
+- **The live loop could not find the reads it was meant to skip.** A run is only
+  long enough to skip once a lead-in pocket and an offer pocket are joined across
+  the minute of pitch that names nothing, and that bridge lived in the batch pass
+  only: on the six real fixtures the live path found **0 of 4** labelled segments
+  while **Analyze captured** found 2. Both paths now derive their runs through
+  `src/detector.js`, so the rule cannot be in one of them alone.
+- Every line is judged, every other line no longer: sampling made the flag density
+  — and therefore what the bridge had to be — depend on a `stride` setting. The
+  same six videos score the same with every line judged, for about twice the local
+  calls (255 rather than 133 for the batch pass).
+- `maxReads` is now honoured by the live loop too, not only by the batch pass. The
+  popup has claimed "at most 6 per video" since the first release.
+- `pageOf(video)` threw when the caller had no page, which sent every verdict to
+  the code heuristic while the run still reported the server's model name.
+
+### Added
+
+- **`npm run real-check`** — six real videos whose transcripts are the videos' own
+  captions, scored against the `sponsor` segments SponsorBlock has for them, with two
+  unlabelled videos kept as controls. It drives the live path and fails if the live
+  path loses a labelled read the batch pass found. Results and method: README.
+
 ## [v0.1.0] — sponsor reads, skipped locally (2026-09-25)
 
 First release. A Chrome extension (Manifest V3) that finds the sponsor reads

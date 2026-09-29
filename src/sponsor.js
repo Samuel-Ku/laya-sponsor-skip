@@ -5,11 +5,13 @@
 // upstream project uses with Jev, and it is why this file can be tested offline:
 // swap the judge for the code heuristic and the whole thing still runs.
 //
-// Shape of one pass: sample lines, ask "is this line inside a sponsor read?",
-// group the yeses into candidate runs, then walk the edges and the lead-in with
-// sharper questions, and finally read the seconds off the lines.
+// Shape of one pass: ask "is this line inside a sponsor read?" about every line,
+// hand the verdicts to the detector for the candidate runs, then walk the edges
+// and the lead-in with sharper questions, and finally read the seconds off the
+// lines.
 
-import { groupRuns, indexLines, lineLabel, medianLineMs, msToLabel } from "./transcript.js";
+import { indexLines, lineLabel, medianLineMs, msToLabel } from "./transcript.js";
+import { deriveRuns, longEnough } from "./detector.js";
 import { isHeuristic } from "./laya.js";
 
 export const DEFAULTS = {
@@ -20,7 +22,6 @@ export const DEFAULTS = {
   maxReads: 6,
   stepMs: 10000, // live mode: jump size while a read is still being heard
   batchSize: 6, // questions per local call — checkpoints are 512/1024 tokens
-  stride: 2, // pass-1 sampling: every second line
   leadinLines: 15, // how far back the lead-in may reach
 };
 
@@ -205,17 +206,12 @@ export async function judgeIndices(judge, lines, indices, kind, { log = () => {}
   return out;
 }
 
-function flagsFromRuns(lines, sampled, threshold) {
-  const sampledIndices = [...sampled.keys()].sort((a, b) => a - b);
-  const flags = lines.map(() => false);
-  for (let i = 0; i < lines.length; i++) {
-    let nearest = null;
-    for (const idx of sampledIndices) {
-      if (nearest === null || Math.abs(idx - i) < Math.abs(nearest - i)) nearest = idx;
-    }
-    flags[i] = nearest !== null && sampled.get(nearest) >= threshold;
-  }
-  return flags;
+/** One verdict per line, in order — the detector's input. */
+function flagsFromProbabilities(lines, probabilities, threshold) {
+  return lines.map((_, i) => {
+    const p = probabilities.get(i);
+    return p == null ? null : p >= threshold;
+  });
 }
 
 /**
@@ -319,46 +315,28 @@ export async function detectSponsors({ video, lines, judge, settings = {}, log =
   }
   lines = indexLines(lines); // saved transcripts may arrive without their indices
 
-  // Pass 1 — sample the transcript and ask where the reads are.
-  const indices = [];
-  for (let i = 0; i < lines.length; i += opts.stride) indices.push(i);
-  if (indices[indices.length - 1] !== lines.length - 1) indices.push(lines.length - 1);
-
+  // Pass 1 — ask about every line, not a sample. A read can only be found where
+  // it was judged, and the detector may bridge a quiet middle only when that
+  // middle was heard (its `false`, not its `null`).
+  const indices = lines.map((_, i) => i);
   onProgress({ phase: "scan", done: 0, total: indices.length });
-  const sampled = await judgeIndices(judge, lines, indices, "inside", { log: say, settings: opts });
+  const judged = await judgeIndices(judge, lines, indices, "inside", { log: say, settings: opts });
   onProgress({ phase: "scan", done: indices.length, total: indices.length });
 
-  const flags = flagsFromRuns(lines, sampled, opts.threshold);
+  const flags = flagsFromProbabilities(lines, judged, opts.threshold);
   const lineMs = medianLineMs(lines);
   const minRun = Math.max(2, Math.min(4, Math.round(opts.minReadMs / lineMs)));
-  // Keep even one-line runs here — the bridge below may be what makes a short
-  // pair of phrase-pockets worth judging; the length gate is applied after.
-  let runs = groupRuns(flags, { minRun: 1 });
-
-  // Merge runs separated by a short gap of unflagged lines: a read is a lead-in,
-  // a pitch and an offer, and the pitch's middle often carries no sales phrases —
-  // it is the shape (selling continues across an unbroken pocket of plain text)
-  // that marks it, and that shape is code-owned. Refinement still asks about the
-  // edges, so for the model this bridge can only ever widen a candidate, never
-  // move a boundary; the lead-in walk-back stays the honest way to grow a start.
-  const bridgeLines = Math.max(3, Math.min(12, Math.round(60000 / Math.max(lineMs, 1))));
-  const bridged = [];
-  for (const run of runs) {
-    const prev = bridged[bridged.length - 1];
-    if (prev && run.from - prev.to - 1 <= bridgeLines) {
-      prev.to = run.to; // runs arrive position-sorted, so the earlier one absorbs the later
-    } else {
-      bridged.push({ ...run });
-    }
-  }
-  runs = bridged.filter((run) => run.to - run.from + 1 >= minRun);
+  // The shape rule first, the length gate after it: a bridged middle makes a
+  // candidate out of pockets that are too short on their own, and refinement is
+  // what then applies the duration filters to whatever boundaries it lands on.
+  const runs = longEnough(deriveRuns(lines, flags), minRun);
 
   // Pass 2 — walk the edges of the most likely runs.
   const scored = runs
     .map((run) => {
       let best = 0;
       for (let i = run.from; i <= run.to; i++) {
-        const p = sampled.get(i);
+        const p = judged.get(i);
         if (p != null) best = Math.max(best, p);
       }
       return { run, score: best };
