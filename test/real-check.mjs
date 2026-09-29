@@ -28,6 +28,7 @@ import { dirname } from "node:path";
 import { indexLines, msToLabel } from "../src/transcript.js";
 import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
 import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
+import { pairReads } from "../src/sponsorblock.js";
 import { checkServer, judgeBatch } from "../src/laya.js";
 
 const DEFAULT_ENDPOINT = "http://127.0.0.1:8765/judge";
@@ -66,23 +67,6 @@ const overlaps = (a, b) => {
   const shared = Math.min(a.endMs, b.endMs) - Math.max(a.startMs, b.startMs);
   return shared > 0 && shared >= Math.min(a.endMs - a.startMs, b.endMs - b.startMs) * 0.5;
 };
-
-/** Pair two lists one-to-one by overlap: a read matched twice is a false positive. */
-function pairByOverlap(left, right) {
-  const used = new Set();
-  const pairs = [];
-  for (const item of left) {
-    let best = null;
-    for (const other of right) {
-      if (used.has(other)) continue;
-      const overlap = Math.max(0, Math.min(item.endMs, other.endMs) - Math.max(item.startMs, other.startMs));
-      if (overlap > 0 && (!best || overlap > best.overlap)) best = { other, overlap };
-    }
-    if (best) used.add(best.other);
-    pairs.push({ item, other: best?.other ?? null });
-  }
-  return { pairs, matchedRight: used };
-}
 
 /**
  * Drive the pipeline the way the watch page does: captions arrive in order, and
@@ -167,20 +151,23 @@ for (const file of files) {
   // while the live path takes reads as they arrive and the cap can stop it early —
   // but the live path may not know LESS: a labelled read the batch pass found and
   // the live path misses is the bug this comparison exists to catch.
-  const { pairs, matchedRight } = pairByOverlap(reads, truth);
-  const batchOnTruth = pairByOverlap(batch.reads, truth).matchedRight;
-  const lostToLive = truth.filter((seg) => batchOnTruth.has(seg) && !matchedRight.has(seg));
+  // The scoring rule — one read to one segment, by the time they share — lives in
+  // src/sponsorblock.js, next to the containment rule the watch page's Compare
+  // button uses: the two callers of that module cannot drift apart.
+  const { pairs, matched } = pairReads(reads, truth);
+  const batchOnTruth = pairReads(batch.reads, truth).matched;
+  const lostToLive = truth.filter((seg) => batchOnTruth.has(seg) && !matched.has(seg));
   if (lostToLive.length) hardFailures++;
-  const both = pairByOverlap(batch.reads, reads);
-  const onlyBatch = both.pairs.filter((p) => !p.other).length;
-  const onlyLive = reads.length - both.matchedRight.size;
+  const both = pairReads(batch.reads, reads);
+  const onlyBatch = both.pairs.filter((p) => !p.seg).length;
+  const onlyLive = reads.length - both.matched.size;
   if (onlyBatch || onlyLive) divergences.push({ file, onlyBatch, onlyLive });
 
   // Best 1:1 match per reported read by overlap; a read matching nothing counts
   // as a false positive, a segment matching nothing as a miss.
-  const matches = pairs.map((p) => ({ read: p.item, seg: p.other }));
+  const matches = pairs;
   const hits = matches.filter((m) => m.seg);
-  const missed = truth.filter((s) => !matchedRight.has(s));
+  const missed = truth.filter((s) => !matched.has(s));
   const fps = matches.filter((m) => !m.seg);
   const perVideo = { hits: hits.length, missed: missed.length, falsePositives: fps.length };
 

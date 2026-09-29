@@ -35,6 +35,13 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
   so are the `refineCandidate`/`groupRuns` tests that measured internals. Driving the
   batch pass through the same interface costs it 12 more local calls across the six
   real videos (255 → 267, with the same 2990 questions and the same results).
+- **One module owns the comparison with SponsorBlock.** `compareReads()` in
+  `src/sponsorblock.js` returns the matched / ours-alone / theirs-alone split both
+  callers want: the watch page's Compare button keeps the containment rule with 5 s
+  of slack it always reported, and the eval scores through `pairReads()` — one read
+  to one segment by the time they share — which it used to keep as a private copy.
+  Same numbers on the six real videos as before (2/4, 0 false positives, controls
+  clean); the rules just cannot drift apart any more.
 
 ### Added
 
