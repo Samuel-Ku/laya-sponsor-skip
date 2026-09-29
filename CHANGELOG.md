@@ -50,6 +50,12 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
   a module now so it can import the constant, and its input's placeholder is filled from
   it instead of a second copy in the HTML. `LAYA_ENDPOINT=...` still overrides it everywhere.
 
+- **The README table now measures the real checkpoint.** With `aac6fef/laya-multilingual-mlx`
+  answering the typed sponsor-read questions, the six real videos score **0/4 with 9 false
+  positives** (413 live calls, 353 batch) and the demo fixture 0/2 — the code stand-in holds
+  the bar at 2/4 with 0. The column's previous numbers came from a bert stand-in answering a
+  different question; its story stays in the README as a warning.
+
 ### Added
 
 - **`npm run real-check`** — six real videos whose transcripts are the videos' own

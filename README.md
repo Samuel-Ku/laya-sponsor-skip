@@ -185,9 +185,10 @@ than 8 s into the content after it, or if anything that is not a read gets repor
 
 With the server in heuristic mode (no checkpoint), the fixture scores **2/2 reads,
 start +7.0 s / +0.0 s, end +0.0 s / +7.0 s, 17 local calls, 72 questions, 29 ms**.
-With the real multilingual checkpoint the boundaries should tighten: the heuristic
-cannot answer the "is the read over here?" question at all, so its ends can be a
-line late, and its starts stop one line early.
+With the real multilingual checkpoint (`aac6fef/laya-multilingual-mlx`), **0/2**: 12 local
+calls, 28 answers of "yes" out of 58 questions answered — but scattered over intro and
+banter, so the runs they form never survive refinement. On this task the code stand-in
+beats the checkpoint; see [Real videos](#real-videos).
 
 ### Real videos
 
@@ -217,15 +218,15 @@ paths had between them before.
 
 Sponsor reads of different shapes, plus two controls:
 
-| Video | The read | SponsorBlock | Code stand-in (`--fake`) | Judge on 8765 |
+| Video | The read | SponsorBlock | Code stand-in (`--fake`) | Real judge (`laya-multilingual-mlx`) |
 | --- | --- | --- | --- | --- |
-| `CLkMCNkwCjI` — UltimateiDeviceVids | Surfshark VPN: mid-roll with a spoken intro and a thank-you outro | 2:42–4:09 | ✅ 2:52–4:06 (start +9.9 s, end −3.6 s) | ✅ 2:34–4:03 (−8.1 s, −5.8 s) + 2 false reads |
-| `brqtaTjBkB0` — Hardware Canucks | Drop: named sponsor, "a quick word from today's video sponsor" … "check it out down below" | 6:16–6:54 | ✅ 6:16–7:10 (start +0.5 s, end +16.0 s) | ❌ missed + 2 false reads |
-| `cBpGq-vDr2Y` — Marques Brownlee | Eight Sleep: a personal-story read whose offer is compressed into a single "use code" line | 22:40–23:50 | ❌ missed | ❌ missed + 6 false reads |
-| `aircAruvnKk` — 3Blue1Brown | SponsorBlock segment over a **wordless outro** — no captions in it at all | 18:26–18:53 | ⏭️ skipped, unjudgable | ⏭️ skipped, unjudgable |
-| `JwAfHEHQKto` — control | no sponsor segment | — | ✅ silent | ❌ 6 false reads |
-| `rS7scGrFsRo` — control | no sponsor segment | — | ✅ silent | ❌ 1 false read |
-| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (388 live calls, 267 batch) | **1/4 found · 23 false positives · controls 0/2 clean** (508 live calls, 363 batch) |
+| `CLkMCNkwCjI` — UltimateiDeviceVids | Surfshark VPN: mid-roll with a spoken intro and a thank-you outro | 2:42–4:09 | ✅ 2:52–4:06 (start +9.9 s, end −3.6 s) | ❌ missed + 1 false read (the intro, 0:00–0:48) |
+| `brqtaTjBkB0` — Hardware Canucks | Drop: named sponsor, "a quick word from today's video sponsor" … "check it out down below" | 6:16–6:54 | ✅ 6:16–7:10 (start +0.5 s, end +16.0 s) | ❌ missed + 1 false read (0:10–0:53) |
+| `cBpGq-vDr2Y` — Marques Brownlee | Eight Sleep: a personal-story read whose offer is compressed into a single "use code" line | 22:40–23:50 | ❌ missed | ❌ missed + 2 false reads (0:00–1:43, 2:29–3:13) |
+| `aircAruvnKk` — 3Blue1Brown | SponsorBlock segment over a **wordless outro** — no captions in it at all | 18:26–18:53 | ⏭️ skipped, unjudgable | ❌ 5 false reads; segment ⏭️ skipped, unjudgable |
+| `JwAfHEHQKto` — control | no sponsor segment | — | ✅ silent | ✅ silent |
+| `rS7scGrFsRo` — control | no sponsor segment | — | ✅ silent | ✅ silent |
+| **6 videos** | | **4 segments** | **2/4 found · 0 false positives · controls 2/2 clean** (388 live calls, 267 batch) | **0/4 found · 9 false positives · controls 2/2 clean** (413 live calls, 353 batch) |
 
 The two runs differ in one thing only: who answered the questions.
 
@@ -239,19 +240,33 @@ heuristic cannot answer "is the read over here?". Those two reads are only found
 because of the bridge: the lead-in pocket scores yes, the offer pocket scores yes a
 minute later, and the pitch in between names nothing.
 
-**The judge on `127.0.0.1:8765`** in this environment was `server_bert.py`, which serves
-`bondarchukb/bert-ads-classification` on `mps` — a stand-in that never reads the
-`questions` or `criteria` from the request and instead verbalizes each candidate as a
-**DOM ad slot** ("Visible text: …", IAB sizes, disclosure labels). It is answering *"does
-this text look like an advertisement?"*, not *"is this spoken line inside a sponsor read?"*,
-and the answers are noise for this task: it scores `this video is sponsored by surfshark vpn`
-at **0.06** and `so the question is whether this deal is actually worth it for most people`
-at **0.999**. The pipeline then does the only thing it can — it skips what the judge
-points at — which is why that column has 23 false positives and why the run exits red.
-Those numbers measure the stand-in, not the pipeline: with a checkpoint that answers the
-narrow question, the same four segments are the ones to beat.
+**The real judge** — `aac6fef/laya-multilingual-mlx` through `laya-mlx` on `mps`, answering
+the typed sponsor-read questions, ~2.3 s per local call — scores **0/4 with 9 false
+positives** on the same six videos (413 live calls, 353 batch, 3275 questions; the run
+exits 1, as a strict run should when it goes 0-for). The raw signal is not hopeless:
+asked about the Surfshark read directly, the model gives its lines **0.93–0.95** on the
+inside question, and plain mid-video narration **0.46–0.69**. What fails is everything
+around that signal. The yeses sit close to the threshold and flip with context — the
+batch pass selects differently from the live path on 5 of 6 videos — and they leak past
+a read's edges (content lines right after the read also score 0.95), so the run the
+pipeline ends up refining is either rejected by the boundary questions or bloated past
+the cut. Meanwhile shorter stretches elsewhere clear the bar and become the 9 false
+positives. On the demo fixture the model says "yes" to 28 of 58 lines and finds nothing.
+Judged one line at a time with narrow questions, spoken sponsor reads are out of
+distribution for this checkpoint. These numbers are the record to beat: any judge swap —
+a fine-tune, a bigger model, different questions — has a clear bar, **2/4 with 0 false
+positives**, and the code stand-in currently holds it.
 
-That column also shows why the cap is a policy and not a courtesy: a judge that fires
+For contrast, an earlier environment served `server_bert.py` —
+`bondarchukb/bert-ads-classification`, a stand-in that never reads the `questions` and
+verbalizes each candidate as a **DOM ad slot** instead. It answered *"does this text look
+like an advertisement?"* — scoring `this video is sponsored by surfshark vpn` at **0.06**
+and ordinary narration at **0.999** — and cost the pipeline 1/4 with 23 false positives.
+That run is why the limits section says to check the model name in the panel: a judge
+answering a different question is worse than no judge, and nothing in the response says
+so.
+
+The bert contrast also shows why the cap is a policy and not a courtesy: a judge that fires
 on a third of the transcript fills the six-read budget before the real read arrives, so
 the live path never gets to MKBHD's. Both paths now honour `maxReads`, which is what the
 popup has always claimed.
