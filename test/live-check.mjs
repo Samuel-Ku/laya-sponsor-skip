@@ -14,7 +14,7 @@ import { readFileSync } from "node:fs";
 
 import { indexLines, msToLabel } from "../src/transcript.js";
 import { detectSponsors } from "../src/detector.js";
-import { heuristicProbabilities, makeJudge } from "../src/sponsor.js";
+import { heuristicAnswer, makeJudge } from "../src/sponsor.js";
 import { checkServer, healthUrlFor, judgeBatch, LAYA_ENDPOINT } from "../src/laya.js";
 
 const DEFAULT_ENDPOINT = LAYA_ENDPOINT; // the address lives in laya.js
@@ -33,7 +33,7 @@ const judge = fake
   ? async ({ cards }) => {
       calls++;
       questions += cards.length;
-      return { probabilities: heuristicProbabilities(cards), model: "heuristic (--fake)", heuristic: true };
+      return heuristicAnswer(cards, { model: "heuristic (--fake)" });
     }
   : makeJudge({
       video: fixture.video,

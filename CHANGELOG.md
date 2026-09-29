@@ -56,6 +56,13 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
   the bar at 2/4 with 0. The column's previous numbers came from a bert stand-in answering a
   different question; its story stays in the README as a warning.
 
+- **The code heuristic answers through one adapter on the judge seam.**
+  `heuristicAnswer(cards, { model })` in `src/sponsor.js` produces the exact
+  `{ probabilities, model, heuristic }` shape every consumer of the seam reads; the five
+  call sites that used to hand-roll it — `makeJudge`'s two fallback paths, both eval
+  scripts' `--fake` judges, the live-path harness, a unit-test stub — now call it, with
+  `HEURISTIC_MODEL` naming the stand-in in one place.
+
 ### Added
 
 - **`npm run real-check`** — six real videos whose transcripts are the videos' own

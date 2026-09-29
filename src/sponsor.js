@@ -104,17 +104,30 @@ export function makeJudge({ video, transport, log = () => {} }) {
       if (res?.error) throw new Error(res.error);
     } catch (err) {
       log({ kind: "judge-error", message: err?.message ?? String(err), verdict: "heuristic" });
-      return { probabilities: heuristicProbabilities(cards), model: "heuristic (offline)", heuristic: true };
+      return heuristicAnswer(cards, { model: "heuristic (offline)" });
     }
     if (isHeuristic(res?.model) || !Array.isArray(res?.probabilities) || res.probabilities.length !== cards.length) {
       log({ kind: "judge-heuristic", model: res?.model, verdict: "heuristic" });
-      return { probabilities: heuristicProbabilities(cards), model: res?.model ?? "heuristic", heuristic: true };
+      return heuristicAnswer(cards, { model: res?.model ?? HEURISTIC_MODEL });
     }
     return { probabilities: res.probabilities, model: res.model, heuristic: false };
   };
 }
 
-// ---------- the code-side stand-in ----------
+// ---------- the code-side stand-in: the heuristic as an adapter on this seam ----------
+
+/** The model name the code heuristic answers under when nothing else applies. */
+export const HEURISTIC_MODEL = "heuristic";
+
+/**
+ * The heuristic dressed as a judge's answer: the exact shape every caller of the
+ * judge seam consumes (`{ probabilities, model, heuristic }`). One adapter instead
+ * of every caller wrapping the heuristic by hand — that used to live in five
+ * places, with three spellings of the model name.
+ */
+export function heuristicAnswer(cards, { model = HEURISTIC_MODEL } = {}) {
+  return { probabilities: heuristicProbabilities(cards), model, heuristic: true };
+}
 
 // Phrasings that only exist to sell something, phrasings that usually introduce
 // a read, and — from the upstream criteria — the things that are not sponsors.
