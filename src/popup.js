@@ -1,3 +1,5 @@
+import { LAYA_ENDPOINT } from "./laya.js";
+
 const DEFAULTS = {
   enabled: true,
   autoSkip: false,
@@ -9,7 +11,7 @@ const DEFAULTS = {
   stepSeconds: 10,
   enableCaptions: true,
   toast: true,
-  serverUrl: "http://127.0.0.1:8765/judge",
+  serverUrl: LAYA_ENDPOINT, // the address lives in laya.js, with the server contract
 };
 
 const $ = (id) => document.getElementById(id);
@@ -41,6 +43,7 @@ async function loadStats() {
 async function init() {
   const s = await chrome.storage.sync.get(DEFAULTS);
   $("enabled").checked = s.enabled;
+  $("serverUrl").placeholder = LAYA_ENDPOINT; // the static HTML is not the definition
   $("serverUrl").value = s.serverUrl;
   $("autoSkip").checked = s.autoSkip;
   $("enableCaptions").checked = s.enableCaptions;

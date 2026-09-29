@@ -22,7 +22,7 @@
   <section>
     <label for="serverUrl">Local judge server</label>
     <div class="row">
-      <input type="text" id="serverUrl" placeholder="http://127.0.0.1:8765/judge" autocomplete="off" spellcheck="false" />
+      <input type="text" id="serverUrl" autocomplete="off" spellcheck="false" />
       <button id="testServer" title="Test the local server">Test</button>
     </div>
     <p class="hint" id="serverStatus"></p>
@@ -66,6 +66,6 @@
     video's own captions, so the first seconds of a read are always heard.
   </p>
 
-  <script src="popup.js"></script>
+  <script type="module" src="popup.js"></script>
 </body>
 </html>

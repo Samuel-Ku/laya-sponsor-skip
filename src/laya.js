@@ -104,6 +104,16 @@ export async function judgeBatch({ state, candidates, questions, model, endpoint
   return { ...parsed, latencyMs: parsed.latencyMs ?? Date.now() - t0 };
 }
 
+/**
+ * The health address that sits next to any judge address: same server, last
+ * path segment swapped. One definition, because the server contract (a /health
+ * beside the /judge endpoint) is one fact and the popup's Test button, the
+ * panel status line and the eval scripts all need it.
+ */
+export function healthUrlFor(endpoint = LAYA_ENDPOINT) {
+  return String(endpoint).replace(/\/judge\/?$/, "/health");
+}
+
 /** GET /health – used by the popup's "Test" button and by the panel status line. */
 export async function checkServer({ endpoint = LAYA_HEALTH_ENDPOINT, fetchImpl = globalThis.fetch } = {}) {
   const res = await fetchImpl(endpoint);

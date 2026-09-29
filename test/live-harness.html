@@ -36,6 +36,8 @@
   <div class="ytp-caption-window-container" style="display:none"></div>
   <div id="journal"></div>
   <script type="module">
+    import { LAYA_ENDPOINT } from "../src/laya.js";
+
     const journal = [];
     const say = (line) => {
       journal.push(line);
@@ -77,7 +79,7 @@
 
     // ---- fake extension APIs: storage, and the judge round-trip to the real server
     const store = {
-      sync: { enabled: true, autoSkip: true, threshold: 0.7, cutThreshold: 0.8, minReadSeconds: 20, maxReadSeconds: 180, maxReads: 6, stepSeconds: 10, enableCaptions: true, toast: false, serverUrl: "http://127.0.0.1:8765/judge" },
+      sync: { enabled: true, autoSkip: true, threshold: 0.7, cutThreshold: 0.8, minReadSeconds: 20, maxReadSeconds: 180, maxReads: 6, stepSeconds: 10, enableCaptions: true, toast: false, serverUrl: LAYA_ENDPOINT },
       local: { totalSkipped: 0 },
     };
     const listeners = { runtime: [] };

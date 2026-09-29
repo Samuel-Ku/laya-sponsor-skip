@@ -11,7 +11,7 @@ import { formatLines, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, pa
 import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
 import { CRITERIA, heuristicProbabilities, lineCard, makeJudge, pageOf, questionsFor } from "../src/sponsor.js";
 import { compareReads, pairReads } from "../src/sponsorblock.js";
-import { MAX_CANDIDATES_PER_REQUEST, buildRequest, isHeuristic, parseResponse } from "../src/laya.js";
+import { MAX_CANDIDATES_PER_REQUEST, buildRequest, healthUrlFor, isHeuristic, LAYA_ENDPOINT, LAYA_HEALTH_ENDPOINT, parseResponse } from "../src/laya.js";
 
 const fixtureJson = JSON.parse(readFileSync(new URL("./fixtures/demo-transcript.json", import.meta.url), "utf8"));
 const fixture = { ...fixtureJson, lines: indexLines(fixtureJson.lines) };
@@ -330,6 +330,17 @@ test("pairReads: shared time picks the partner, ties keep the first segment", ()
   assert.equal(pairs[0].seg, first); // 60 s shared, both — first wins, deterministically
   assert.equal(matched.size, 1);
   assert.deepEqual(pairReads([], []).pairs, []);
+});
+
+test("one place owns the judge address and the /health that sits beside it", () => {
+  // Every caller — background, popup, the eval scripts, the harness pages —
+  // imports these; the URL appears in exactly one definition.
+  assert.equal(LAYA_ENDPOINT, "http://127.0.0.1:8765/judge");
+  assert.equal(LAYA_HEALTH_ENDPOINT, healthUrlFor(LAYA_ENDPOINT));
+  assert.equal(healthUrlFor("http://127.0.0.1:9000/judge"), "http://127.0.0.1:9000/health");
+  assert.equal(healthUrlFor("http://127.0.0.1:9000/judge/"), "http://127.0.0.1:9000/health");
+  assert.equal(healthUrlFor("http://127.0.0.1:9000"), "http://127.0.0.1:9000");
+  assert.equal(healthUrlFor("http://127.0.0.1:9000/other/"), "http://127.0.0.1:9000/other/");
 });
 
 test("a missing video page never costs a judge call", async () => {

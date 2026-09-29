@@ -2,22 +2,17 @@
 // the badge and the running total. The content script never needs to know where
 // the server is or how a request is shaped.
 
-import { checkServer, DEFAULT_MODEL, judgeBatch } from "./laya.js";
+import { checkServer, DEFAULT_MODEL, healthUrlFor, judgeBatch, LAYA_ENDPOINT } from "./laya.js";
 import { sponsorBlockSegments } from "./sponsorblock.js";
 
 const DEFAULTS = {
   enabled: true,
   autoSkip: false,
-  serverUrl: "http://127.0.0.1:8765/judge",
+  serverUrl: LAYA_ENDPOINT, // the address lives in laya.js, with the server contract
 };
 
 async function getSettings() {
   return { ...DEFAULTS, ...(await chrome.storage.sync.get(DEFAULTS)) };
-}
-
-/** The health endpoint sits next to the judge endpoint on the same server. */
-function healthUrlFor(serverUrl) {
-  return String(serverUrl || DEFAULTS.serverUrl).replace(/\/judge\/?$/, "/health");
 }
 
 const badgeCounts = new Map(); // tabId -> reads skipped on the current page
