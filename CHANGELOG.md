@@ -74,8 +74,11 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
 
 - **`EXPERIMENTS.md`** — why the real checkpoint scores 0/4 and what does not fix it:
   three question rewrites, batch composition (the same line scores 0.90 alone, 0.19 in
-  a mixed batch — pure batches separate at 0.85 vs 0.13, mixed ones go flat), and
-  `batchSize: 1` through the real detector. The lever is a fine-tune, not a knob.
+  a mixed batch — pure batches separate at 0.85 vs 0.13, mixed ones go flat),
+  `batchSize: 1` through the real detector, and oracle-pure batches (every call split
+  by ground truth) leaving the strict numbers untouched — the confidence that makes or
+  breaks a run is minted in refinement, not in the inside calls. The lever is a
+  fine-tune, not a knob.
 - **`npm run real-check`** — six real videos whose transcripts are the videos' own
   captions, scored against the `sponsor` segments SponsorBlock has for them, with two
   unlabelled videos kept as controls. It drives the live path and fails if the live
