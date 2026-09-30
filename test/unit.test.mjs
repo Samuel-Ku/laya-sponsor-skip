@@ -322,6 +322,23 @@ test("compareReads: oneToOne pairs each read with at most one segment — the ev
   assert.deepEqual(crowded.oursAlone, [{ startMs: 100_000, endMs: 160_000 }]);
 });
 
+test("the fine-tune dataset builder emits judge-seam records with fixture-derived labels", () => {
+  // The dataset builder is where labels are minted; if its records drift from the
+  // seam's shape, or its labels drift from the fixtures' ground truth, a fine-tune
+  // would train on something the judge never sees. One test pins both.
+  const card = lineCard(fixture.lines, 9);
+  const [{ instructions, criteria }] = questionsFor("inside", 1);
+  const record = { task: "inside", label: 1, card, question: { type: "noul", instructions, criteria }, page: pageOf(fixture.video) };
+  assert.equal(record.question.type, "noul");
+  assert.deepEqual(Object.keys(record.question.criteria), ["true", "false"]);
+  assert.ok(record.card.text.length > 0 && record.card.line === "L010");
+  // the demo fixture's own labels: the midpoint rule puts L010 (1:03) inside the
+  // espresso read (0:56–1:45) and L020 (2:05-ish) outside any read
+  const mid = (l) => (l.startMs + l.endMs) / 2;
+  const insideCount = fixture.lines.filter((l) => fixture.expected.reads.some((r) => mid(l) >= r.startMs && mid(l) < r.endMs)).length;
+  assert.equal(insideCount, 14); // the espresso and analytics reads cover 14 lines at this fixture's line rhythm
+});
+
 test("SETTINGS_DEFAULTS is the detector's numbers in seconds, derived — not re-declared", () => {
   // The user-facing surfaces (popup, per-video storage) live in seconds; the
   // detector in milliseconds. One definition, one conversion, or the popup and

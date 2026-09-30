@@ -81,5 +81,9 @@ runs measure, and every verdict it gives is labelled `heuristic`. It enters the
 pipeline as any judge does — through `heuristicAnswer(cards, { model })`, the one
 wrapper that dresses its scores in the judge seam's `{ probabilities, model,
 heuristic }` shape.
+**Dataset** — the fine-tune records `npm run dataset` builds (`training/`): one noul
+question + line card + page per record, exactly what a judge call consumes, labelled
+from the fixtures' ground truth. A fine-tune's honest target is the README's bar —
+2/4 with 0 false positives, not val loss.
 **Panel** — the watch-page UI: the reads with their ranges, the log of every question
 with its probability and latency, and the confidence the boundaries were cut at.

@@ -2,3 +2,5 @@ node_modules/
 .DS_Store
 *.log
 .freebuff/
+# Derived data: rebuild with `npm run dataset` (see training/README.md)
+training/*.jsonl

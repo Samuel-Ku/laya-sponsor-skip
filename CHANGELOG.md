@@ -72,6 +72,14 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
 
 ### Added
 
+- **A minimal fine-tune dataset for the judge** — `npm run dataset` builds
+  `training/train.jsonl` (1738 records) and `val.jsonl` (1290) from the labelled
+  fixtures: one noul question + line card + page per record, exactly the shape one
+  judge call consumes, with labels derived from SponsorBlock segments and the demo's
+  hand-labelled reads. Split by whole fixtures; the two hard shapes (MKBHD's
+  unnamed-ad read, 3b1b's wordless outro) hold out for validation.
+  `training/README.md` carries the schema and the honest target (the README's
+  2/4-vs-0/4 bar), and a unit test pins the record shape and label derivation.
 - **`EXPERIMENTS.md`** — why the real checkpoint scores 0/4 and what does not fix it:
   three question rewrites, batch composition (the same line scores 0.90 alone, 0.19 in
   a mixed batch — pure batches separate at 0.85 vs 0.13, mixed ones go flat),
