@@ -32,6 +32,7 @@
     "serve": "python3 -m http.server 8788",
     "judge": "python3 ../laya-adblock/server/server.py",
     "judge:heuristic": "LAYA_HEURISTIC=1 python3 ../laya-adblock/server/server.py",
-    "icons": "python3 icons/make_icons.py"
+    "icons": "python3 icons/make_icons.py",
+    "dataset": "node scripts/build-sponsor-dataset.mjs"
   }
 }
