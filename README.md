@@ -255,7 +255,10 @@ positives. On the demo fixture the model says "yes" to 28 of 58 lines and finds 
 Judged one line at a time with narrow questions, spoken sponsor reads are out of
 distribution for this checkpoint. These numbers are the record to beat: any judge swap —
 a fine-tune, a bigger model, different questions — has a clear bar, **2/4 with 0 false
-positives**, and the code stand-in currently holds it.
+positives**, and the code stand-in currently holds it. Question wording, batching and
+pipeline knobs were probed for a cheap win and none exists — the mechanism (verdicts
+that average within a request) and the numbers are recorded in
+[EXPERIMENTS.md](EXPERIMENTS.md).
 
 For contrast, an earlier environment served `server_bert.py` —
 `bondarchukb/bert-ads-classification`, a stand-in that never reads the `questions` and
