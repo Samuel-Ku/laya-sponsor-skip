@@ -1,14 +1,12 @@
 import { LAYA_ENDPOINT } from "./laya.js";
+import { SETTINGS_DEFAULTS } from "./detector.js";
 
 const DEFAULTS = {
+  // Numbers come from the detector's one definition (SETTINGS_DEFAULTS); what is
+  // declared here is only what belongs to the popup, not the pipeline.
+  ...SETTINGS_DEFAULTS,
   enabled: true,
   autoSkip: false,
-  threshold: 0.7,
-  cutThreshold: 0.8,
-  minReadSeconds: 20,
-  maxReadSeconds: 180,
-  maxReads: 6,
-  stepSeconds: 10,
   enableCaptions: true,
   toast: true,
   serverUrl: LAYA_ENDPOINT, // the address lives in laya.js, with the server contract

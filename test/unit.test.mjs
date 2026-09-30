@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 
 import { formatLines, indexLines, labelToMs, lineLabel, mergeCues, msToLabel, parseJson3, parsePastedTranscript, parseVtt } from "../src/transcript.js";
-import { createDetector, DEFAULTS, detectSponsors } from "../src/detector.js";
+import { createDetector, DEFAULTS, detectSponsors, SETTINGS_DEFAULTS } from "../src/detector.js";
 import { CRITERIA, heuristicAnswer, heuristicProbabilities, HEURISTIC_MODEL, lineCard, makeJudge, pageOf, questionsFor } from "../src/sponsor.js";
 import { compareReads, pairReads } from "../src/sponsorblock.js";
 import { MAX_CANDIDATES_PER_REQUEST, buildRequest, healthUrlFor, isHeuristic, LAYA_ENDPOINT, LAYA_HEALTH_ENDPOINT, parseResponse } from "../src/laya.js";
@@ -320,6 +320,20 @@ test("compareReads: oneToOne pairs each read with at most one segment — the ev
   assert.equal(crowded.matched, 1);
   assert.equal(crowded.extra, 1);
   assert.deepEqual(crowded.oursAlone, [{ startMs: 100_000, endMs: 160_000 }]);
+});
+
+test("SETTINGS_DEFAULTS is the detector's numbers in seconds, derived — not re-declared", () => {
+  // The user-facing surfaces (popup, per-video storage) live in seconds; the
+  // detector in milliseconds. One definition, one conversion, or the popup and
+  // the pipeline drift apart.
+  assert.equal(SETTINGS_DEFAULTS.minReadSeconds, DEFAULTS.minReadMs / 1000);
+  assert.equal(SETTINGS_DEFAULTS.maxReadSeconds, DEFAULTS.maxReadMs / 1000);
+  assert.equal(SETTINGS_DEFAULTS.stepSeconds, DEFAULTS.stepMs / 1000);
+  assert.equal(SETTINGS_DEFAULTS.threshold, DEFAULTS.threshold);
+  assert.equal(SETTINGS_DEFAULTS.cutThreshold, DEFAULTS.cutThreshold);
+  assert.equal(SETTINGS_DEFAULTS.maxReads, DEFAULTS.maxReads);
+  // and the numbers the popup has always shown
+  assert.deepEqual(SETTINGS_DEFAULTS, { threshold: 0.7, cutThreshold: 0.8, minReadSeconds: 20, maxReadSeconds: 180, maxReads: 6, stepSeconds: 10 });
 });
 
 test("heuristicAnswer dresses the heuristic in the judge seam's exact shape", () => {

@@ -37,6 +37,7 @@
   <div id="journal"></div>
   <script type="module">
     import { LAYA_ENDPOINT } from "../src/laya.js";
+    import { SETTINGS_DEFAULTS } from "../src/detector.js";
 
     const journal = [];
     const say = (line) => {
@@ -79,7 +80,7 @@
 
     // ---- fake extension APIs: storage, and the judge round-trip to the real server
     const store = {
-      sync: { enabled: true, autoSkip: true, threshold: 0.7, cutThreshold: 0.8, minReadSeconds: 20, maxReadSeconds: 180, maxReads: 6, stepSeconds: 10, enableCaptions: true, toast: false, serverUrl: LAYA_ENDPOINT },
+      sync: { ...SETTINGS_DEFAULTS, enabled: true, autoSkip: true, enableCaptions: true, toast: false, serverUrl: LAYA_ENDPOINT },
       local: { totalSkipped: 0 },
     };
     const listeners = { runtime: [] };

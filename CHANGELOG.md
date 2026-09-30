@@ -63,6 +63,13 @@ one `## [ vX.Y.Z ] — title (date)` section per release.
   scripts' `--fake` judges, the live-path harness, a unit-test stub — now call it, with
   `HEURISTIC_MODEL` naming the stand-in in one place.
 
+- **One source for the settings numbers.** The detector's `DEFAULTS` (milliseconds) is the
+  only place the pipeline's numbers are declared; a derived `SETTINGS_DEFAULTS` — the same
+  numbers in the seconds the popup and the per-video storage spell — is what the content
+  script, the popup, the service worker and the live-path harness spread into their own
+  defaults. Four copies of the numbers with two unit systems become one definition, one
+  conversion, and a test that pins the derivation.
+
 ### Added
 
 - **`npm run real-check`** — six real videos whose transcripts are the videos' own

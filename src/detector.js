@@ -36,6 +36,22 @@ export const DEFAULTS = {
   leadinLines: 15, // how far back the lead-in may reach
 };
 
+/**
+ * The same numbers in the units the user-facing surfaces live in — seconds, as
+ * the popup and the per-video settings store spell them — derived from
+ * `DEFAULTS` above, never re-declared: the detector's millisecond constants are
+ * the one definition, this is their user-facing shadow. Change a number up
+ * there and the popup's defaults follow; a test pins the derivation.
+ */
+export const SETTINGS_DEFAULTS = {
+  threshold: DEFAULTS.threshold,
+  cutThreshold: DEFAULTS.cutThreshold,
+  minReadSeconds: DEFAULTS.minReadMs / 1000,
+  maxReadSeconds: DEFAULTS.maxReadMs / 1000,
+  maxReads: DEFAULTS.maxReads,
+  stepSeconds: DEFAULTS.stepMs / 1000,
+};
+
 // ---------- the shape of a read ----------
 
 // How much of a read's middle may name nothing at all. A sponsor read is a
