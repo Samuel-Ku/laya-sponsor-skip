@@ -13,20 +13,17 @@
 
 import { mergeCues, msToLabel, parsePastedTranscript } from "./transcript.js";
 import { makeJudge } from "./sponsor.js";
-import { createDetector, DEFAULTS as SPONSOR_DEFAULTS, detectSponsors } from "./detector.js";
+import { createDetector, detectSponsors, SETTINGS_DEFAULTS } from "./detector.js";
 import { compareReads } from "./sponsorblock.js";
 import { createPanel, showToast } from "./panel.js";
 import * as yt from "./youtube.js";
 
 const DEFAULTS = {
+  // Numbers come from the detector's one definition (SETTINGS_DEFAULTS); what is
+  // declared here is only what belongs to the watch page, not the pipeline.
+  ...SETTINGS_DEFAULTS,
   enabled: true,
   autoSkip: false,
-  threshold: SPONSOR_DEFAULTS.threshold,
-  cutThreshold: SPONSOR_DEFAULTS.cutThreshold,
-  minReadSeconds: SPONSOR_DEFAULTS.minReadMs / 1000,
-  maxReadSeconds: SPONSOR_DEFAULTS.maxReadMs / 1000,
-  maxReads: SPONSOR_DEFAULTS.maxReads,
-  stepSeconds: SPONSOR_DEFAULTS.stepMs / 1000,
   enableCaptions: true,
   toast: true,
 };

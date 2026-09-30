@@ -32,6 +32,10 @@ run's end is known; an open one's is not, and only the live path ever sees one.
 holds the verdict for every line it has been shown, how far into the transcript it
 has judged, and the shape rules. Its interface is `observe(lines)` →
 `{ closed, open, newest, judged }`, `refine(run)` → a read or `null`, and `reset()`.
+**Settings** — the detector speaks milliseconds (`DEFAULTS`); the popup and the
+per-video storage speak seconds. `SETTINGS_DEFAULTS` in the same file is the derived
+seconds shadow, and every user-facing defaults object spreads it — the numbers are
+declared once, converted once.
 **Judged** — a line the detector has a verdict for. A line without one is `null`, not
 `false`: nobody has asked about it, which is why it cannot be bridged across.
 **Newest verdict** — the verdict on the last line judged, which is what "am I hearing

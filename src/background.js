@@ -4,8 +4,10 @@
 
 import { checkServer, DEFAULT_MODEL, healthUrlFor, judgeBatch, LAYA_ENDPOINT } from "./laya.js";
 import { sponsorBlockSegments } from "./sponsorblock.js";
+import { SETTINGS_DEFAULTS } from "./detector.js";
 
 const DEFAULTS = {
+  ...SETTINGS_DEFAULTS, // every key storage can hold, with the detector's numbers
   enabled: true,
   autoSkip: false,
   serverUrl: LAYA_ENDPOINT, // the address lives in laya.js, with the server contract
